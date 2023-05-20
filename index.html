@@ -36,6 +36,7 @@
                 font-size: 24px;
             }
 
+
         .dark-mode {
             background-color: #f0f0f0;
             color: #333;
@@ -51,6 +52,18 @@
             #settings-icon i {
                 font-size: 24px;
             }
+
+
+        @media only screen and (max-width: 600px) {
+                #mode i {
+                    font-size: 6vw;
+                }
+
+                #settings-icon i {
+                    font-size: 6vw;
+                }
+        }
+
 
         .rotate {
             transform: rotate(90deg);
@@ -94,12 +107,12 @@
             margin-bottom: 20px;
         }
 
-            #settings input[type="text"] {
+/*            #settings input[type="text"] {
             }
 
         .dark-mode input[type="text"] {
             background-color: #444;
-        }
+        }*/
 
             .dark-mode input[type="text"]:focus {
                 outline: none;
