@@ -54,13 +54,14 @@
             }
 
 
-        @media only screen and (max-width: 600px) {
+        @media screen and (max-width: 800px) {
                 #mode i {
-                    font-size: 6vw;
+                    font-size: 10vw;
                 }
 
                 #settings-icon i {
-                    font-size: 6vw;
+                    font-size: 10vw;
+                    margin-right:5vw;
                 }
         }
 
@@ -156,39 +157,42 @@
         });
     </script>
 </head>
-  <body>
+<body>
+    <script>
+        loadSettings();
+    </script>
     <div id="date"></div>
     <div id="clock"></div>
     <div id="mode"><i class="fas fa-sun"></i></div>
     <div id="settings-icon"><i class="fas fa-cog"></i></div>
     <div id="settings">
-      <label for="site1">Site 1:</label>
-      <input type="text" id="site1">
-      <label for="site2">Site 2:</label>
-      <input type="text" id="site2">
-      <label for="site3">Site 3:</label>
-      <input type="text" id="site3">
-      <button id="save">Save</button>
+        <label for="site1">Site 1:</label>
+        <input type="text" id="site1">
+        <label for="site2">Site 2:</label>
+        <input type="text" id="site2">
+        <label for="site3">Site 3:</label>
+        <input type="text" id="site3">
+        <button id="save">Save</button>
     </div>
 
     <script>
 
-       function displayTime() {
-           let date = new Date();
+        function displayTime() {
+            let date = new Date();
 
-           let options = { weekday: 'long', month: 'short', day: 'numeric' };
-           let dateString = date.toLocaleDateString('en-US', options);
-           document.getElementById("date").textContent = dateString;
-          
-           let timeString = date.toLocaleTimeString();
-           document.getElementById("clock").textContent = timeString;
-           document.title =  timeString;
-       }
+            let options = { weekday: 'long', month: 'short', day: 'numeric' };
+            let dateString = date.toLocaleDateString('en-US', options);
+            document.getElementById("date").textContent = dateString;
 
-       displayTime();
-       const createClock = setInterval(displayTime, 1000);
+            let timeString = date.toLocaleTimeString();
+            document.getElementById("clock").textContent = timeString;
+            document.title = timeString;
+        }
 
-       document.getElementById("mode").addEventListener("click", function() {
+        displayTime();
+        const createClock = setInterval(displayTime, 1000);
+
+        document.getElementById("mode").addEventListener("click", function () {
             document.body.classList.toggle("dark-mode");
             let icon = document.querySelector("#mode i");
             if (icon.classList.contains("fa-sun")) {
@@ -200,88 +204,88 @@
                 icon.classList.add("fa-sun");
                 localStorage.setItem('mode', 'light');
             }
-       });
+        });
 
-       document.getElementById("settings-icon").addEventListener("click", function() {
+        document.getElementById("settings-icon").addEventListener("click", function () {
             let settings = document.getElementById("settings");
-           if (settings.style.display === "none") {
-               settings.style.display = "block";
-               settings.style.right = '-300px';
-               setTimeout(function () {
-                   settings.style.transition = 'right 0.5s ease-in-out';
-                   settings.style.right = '10px';
-               }, 50)
-               loadSettings();
-               this.querySelector('i').classList.add('rotate')
-               this.querySelector('i').classList.remove('rotate-back')
-           } else {
-               settings.style.right = '10px';
-               setTimeout(function () {
-                   settings.style.transition = 'right 0.5s ease-in-out';
-                   settings.style.right = '-300px';
-               }, 50)
-               setTimeout(function () {
-                   settings.style.display = 'none';
-                   settings.style.transition = 'none';
-               }, 500)
-               this.querySelector('i').classList.remove('rotate')
-               this.querySelector('i').classList.add('rotate-back')
-           }
-       });
-
-       document.getElementById("save").addEventListener("click", function() {
-           saveSettings();
-           alert("Settings saved!");
-           document.getElementById("settings")//.style.display = "none";
-           loadSettings();
-
-
-
-       });
-
-       function saveSettings() {
-           let site1 = document.getElementById("site1").value;
-           let site2 = document.getElementById("site2").value;
-           let site3 = document.getElementById("site3").value;
-
-           localStorage.setItem("site1", site1);
-           localStorage.setItem("site2", site2);
-           localStorage.setItem("site3", site3);
-       }
-
-       function loadSettings() {
-           let site1 = localStorage.getItem("site1");
-           let site2 = localStorage.getItem("site2");
-           let site3 = localStorage.getItem("site3");
-
-           if (site1) {
-               document.getElementById("site1").value = site1;
-           }
-           if (site2) {
-               document.getElementById("site2").value = site2;
-           }
-           if (site3) {
-               document.getElementById("site3").value = site3;
-           }
-
-       }
-
-       window.addEventListener('keydown', function(event) {
-           if (event.keyCode === 49) { // key code for "1"
-               window.open(localStorage.getItem('site1'), '_blank');
-               window.close();
-            } else if (event.keyCode === 50) { // key code for "2"
-               window.open(localStorage.getItem('site2'), '_blank');
-               window.close();
-            } else if (event.keyCode === 51) { // key code for "3"
-               window.open(localStorage.getItem('site3'), '_blank');
-               window.close();
+            if (settings.style.display === "none") {
+                settings.style.display = "block";
+                settings.style.right = '-300px';
+                setTimeout(function () {
+                    settings.style.transition = 'right 0.5s ease-in-out';
+                    settings.style.right = '10px';
+                }, 50)
+                loadSettings();
+                this.querySelector('i').classList.add('rotate')
+                this.querySelector('i').classList.remove('rotate-back')
+            } else {
+                settings.style.right = '10px';
+                setTimeout(function () {
+                    settings.style.transition = 'right 0.5s ease-in-out';
+                    settings.style.right = '-300px';
+                }, 50)
+                setTimeout(function () {
+                    settings.style.display = 'none';
+                    settings.style.transition = 'none';
+                }, 500)
+                this.querySelector('i').classList.remove('rotate')
+                this.querySelector('i').classList.add('rotate-back')
             }
-       });
+        });
 
-       loadSettings();
+        document.getElementById("save").addEventListener("click", function () {
+            saveSettings();
+            alert("Settings saved!");
+            document.getElementById("settings")//.style.display = "none";
+            loadSettings();
+
+
+
+        });
+
+        function saveSettings() {
+            let site1 = document.getElementById("site1").value;
+            let site2 = document.getElementById("site2").value;
+            let site3 = document.getElementById("site3").value;
+
+            localStorage.setItem("site1", site1);
+            localStorage.setItem("site2", site2);
+            localStorage.setItem("site3", site3);
+        }
+
+        function loadSettings() {
+            let site1 = localStorage.getItem("site1");
+            let site2 = localStorage.getItem("site2");
+            let site3 = localStorage.getItem("site3");
+
+            if (site1) {
+                document.getElementById("site1").value = site1;
+            }
+            if (site2) {
+                document.getElementById("site2").value = site2;
+            }
+            if (site3) {
+                document.getElementById("site3").value = site3;
+            }
+
+        }
+
+        window.addEventListener('keydown', function (event) {
+            if (event.keyCode === 49) { // key code for "1"
+                window.open(localStorage.getItem('site1'), '_blank');
+                window.close();
+            } else if (event.keyCode === 50) { // key code for "2"
+                window.open(localStorage.getItem('site2'), '_blank');
+                window.close();
+            } else if (event.keyCode === 51) { // key code for "3"
+                window.open(localStorage.getItem('site3'), '_blank');
+                window.close();
+            }
+        });
+
+        loadSettings();
 
     </script>
 
-  </body>
+</body>
 </html>
