@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Zilla+Slab&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <title>Time</title>
+    <style>
+        body {
+            transition: background-color 1.0s, color 1.0s;
+            background-color: #222;
+            color: #f0f0f0;
+        }
+
+        #date {
+            text-align: center;
+            font-size: 50px;
+            margin-top: 15%;
+            margin-bottom: -1%;
+            font-family: "Zilla Slab", serif;
+        }
+
+        #clock {
+            font-size: 120px;
+            text-align: center;
+            font-family: "Zilla Slab", serif;
+        }
+
+        #mode {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+        }
+
+            #mode i {
+                font-size: 24px;
+            }
+
+        .dark-mode {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+
+        #settings-icon {
+            position: absolute;
+            top: 10px;
+            right: 50px;
+            cursor: pointer;
+        }
+
+            #settings-icon i {
+                font-size: 24px;
+            }
+
+        .rotate {
+            transform: rotate(90deg);
+            transition: .7s ease-in-out
+        }
+
+        .rotate-back {
+            transform: rotate(-90deg);
+            transition: .7s ease-in-out
+        }
+
+        #settings {
+            transition: background-color 1.0s, color 1.0s;
+            display: none;
+            position: fixed;
+            top: 50px;
+            right: 10px;
+            background-color: #444;
+            border-radius: 5px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+            font-family: "Zilla Slab", sans-serif;
+        }
+
+        #clock:hover {
+            transform: translate(-500,-100);
+            transition: 1s
+        }
+
+        .dark-mode #settings {
+            background-color: #E0E0E0;
+        }
+
+        #settings label {
+            transition: background-color 1.0s, color 1.0s;
+            display: block;
+        }
+
+        #settings input {
+            width: 97%;
+            margin-bottom: 20px;
+        }
+
+            #settings input[type="text"] {
+            }
+
+        .dark-mode input[type="text"] {
+            background-color: #444;
+        }
+
+            .dark-mode input[type="text"]:focus {
+                outline: none;
+            }
+
+        input[type="text"]:focus {
+            outline: none;
+        }
+
+        button {
+            padding: .5em .75em;
+            width: 100%;
+        }
+
+        .disable-transition * {
+            transition: none !important;
+        }
+    </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            let mode = localStorage.getItem('mode');
+            if (mode === 'dark') {
+                document.body.classList.add('disable-transition');
+                document.body.classList.add('dark-mode');
+                let icon = document.querySelector("#mode i");
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            } else if (mode === 'light') {
+                document.body.classList.add('disable-transition');
+                document.body.classList.remove('dark-mode');
+                let icon = document.querySelector("#mode i");
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            }
+
+            setTimeout(function () {
+                document.body.classList.remove('disable-transition');
+            }, 100);
+
+        });
+    </script>
+</head>
+  <body>
+    <div id="date"></div>
+    <div id="clock"></div>
+    <div id="mode"><i class="fas fa-sun"></i></div>
+    <div id="settings-icon"><i class="fas fa-cog"></i></div>
+    <div id="settings">
+      <label for="site1">Site 1:</label>
+      <input type="text" id="site1">
+      <label for="site2">Site 2:</label>
+      <input type="text" id="site2">
+      <label for="site3">Site 3:</label>
+      <input type="text" id="site3">
+      <button id="save">Save</button>
+    </div>
+
+    <script>
+
+       function displayTime() {
+           let date = new Date();
+
+           let options = { weekday: 'long', month: 'short', day: 'numeric' };
+           let dateString = date.toLocaleDateString('en-US', options);
+           document.getElementById("date").textContent = dateString;
+          
+           let timeString = date.toLocaleTimeString();
+           document.getElementById("clock").textContent = timeString;
+           document.title =  timeString;
+       }
+
+       displayTime();
+       const createClock = setInterval(displayTime, 1000);
+
+       document.getElementById("mode").addEventListener("click", function() {
+            document.body.classList.toggle("dark-mode");
+            let icon = document.querySelector("#mode i");
+            if (icon.classList.contains("fa-sun")) {
+                icon.classList.remove("fa-sun");
+                icon.classList.add("fa-moon");
+                localStorage.setItem('mode', 'dark');
+            } else {
+                icon.classList.remove("fa-moon");
+                icon.classList.add("fa-sun");
+                localStorage.setItem('mode', 'light');
+            }
+       });
+
+       document.getElementById("settings-icon").addEventListener("click", function() {
+            let settings = document.getElementById("settings");
+           if (settings.style.display === "none") {
+               settings.style.display = "block";
+               settings.style.right = '-300px';
+               setTimeout(function () {
+                   settings.style.transition = 'right 0.5s ease-in-out';
+                   settings.style.right = '10px';
+               }, 50)
+               loadSettings();
+               this.querySelector('i').classList.add('rotate')
+               this.querySelector('i').classList.remove('rotate-back')
+           } else {
+               settings.style.right = '10px';
+               setTimeout(function () {
+                   settings.style.transition = 'right 0.5s ease-in-out';
+                   settings.style.right = '-300px';
+               }, 50)
+               setTimeout(function () {
+                   settings.style.display = 'none';
+                   settings.style.transition = 'none';
+               }, 500)
+               this.querySelector('i').classList.remove('rotate')
+               this.querySelector('i').classList.add('rotate-back')
+           }
+       });
+
+       document.getElementById("save").addEventListener("click", function() {
+           saveSettings();
+           alert("Settings saved!");
+           document.getElementById("settings")//.style.display = "none";
+           loadSettings();
+
+
+
+       });
+
+       function saveSettings() {
+           let site1 = document.getElementById("site1").value;
+           let site2 = document.getElementById("site2").value;
+           let site3 = document.getElementById("site3").value;
+
+           localStorage.setItem("site1", site1);
+           localStorage.setItem("site2", site2);
+           localStorage.setItem("site3", site3);
+       }
+
+       function loadSettings() {
+           let site1 = localStorage.getItem("site1");
+           let site2 = localStorage.getItem("site2");
+           let site3 = localStorage.getItem("site3");
+
+           if (site1) {
+               document.getElementById("site1").value = site1;
+           }
+           if (site2) {
+               document.getElementById("site2").value = site2;
+           }
+           if (site3) {
+               document.getElementById("site3").value = site3;
+           }
+
+       }
+
+       window.addEventListener('keydown', function(event) {
+           if (event.keyCode === 49) { // key code for "1"
+               document.location.href = localStorage.getItem('site1');
+            } else if (event.keyCode === 50) { // key code for "2"
+               document.location.href = localStorage.getItem('site2');
+            } else if (event.keyCode === 51) { // key code for "3"
+               window.location.href = localStorage.getItem('site3');
+            }
+       });
+
+       loadSettings();
+
+    </script>
+
+  </body>
+</html>
