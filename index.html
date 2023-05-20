@@ -268,11 +268,14 @@
 
        window.addEventListener('keydown', function(event) {
            if (event.keyCode === 49) { // key code for "1"
-               document.location.href = localStorage.getItem('site1');
+               window.open(localStorage.getItem('site1'), '_blank');
+               window.close();
             } else if (event.keyCode === 50) { // key code for "2"
-               document.location.href = localStorage.getItem('site2');
+               window.open(localStorage.getItem('site2'), '_blank');
+               window.close();
             } else if (event.keyCode === 51) { // key code for "3"
-               window.location.href = localStorage.getItem('site3');
+               window.open(localStorage.getItem('site3'), '_blank');
+               window.close();
             }
        });
 
