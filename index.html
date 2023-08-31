@@ -182,7 +182,11 @@
             let dateString = date.toLocaleDateString('en-US', options);
             document.getElementById("date").textContent = dateString;
 
-            let timeString = date.toLocaleTimeString();
+            /*let timeString = date.toLocaleTimeString();*/
+			let timeOptions = { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            let timeString = date.toLocaleTimeString('en-US', timeOptions);
+            timeString = timeString.replace(/(AM|PM)/, '');
+ 
             document.getElementById("clock").textContent = timeString;
             document.title = timeString;
         }
