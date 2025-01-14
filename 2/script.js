@@ -173,8 +173,8 @@ document.addEventListener('keydown', handleKeyPress);
 
 
 // Close popup when clicking outside the content
-document.getElementById('popup').addEventListener('click', (event) => {
-    if (event.target === document.getElementById('popup')) {
+document.getElementById('popup-background').addEventListener('click', (event) => {
+    if (event.target === document.getElementById('popup-background')) {
         hidePopup();
     }
 });
