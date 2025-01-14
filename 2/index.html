@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shortcut Launcher</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=rotate_left,settings" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=close,rotate_left,save,settings" />
 </head>
 <body>
     <div id="container">
         <div id="time-date">
             <div id="time">00:00:00</div>
             <div id="date">Monday Jan 01</div>
-            <div id="shortcuts"></div>
+            <div id="favicons"></div>
         </div>
     </div>
 
@@ -28,15 +28,21 @@
     
 
     <div id="popup">
+        <div id="popup-background"></div>
+        <span id="close" class="material-symbols-outlined">close</span>
         <div id="popup-content">
-            <label for="key">Key:</label>
-            <input type="text" id="key" maxlength="1">
-            <label for="url">URL:</label>
-            <input type="text" id="url">
+            <label for="key">Settings:</label>
+            
+            <div id="add-shortcut">
+                <input type="text" id="key" maxlength="1">
+                <input type="text" id="url">        
+                <span id="save" class="material-symbols-outlined">save</span>
+            </div>
+            <hr>
             <div id="saved-shortcuts"></div>
             <div class="popup-buttons">
-                <button id="save">Save</button>
-                <button id="close">Close</button>
+                
+                
             </div>
         </div>
     </div>
