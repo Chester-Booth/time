@@ -88,8 +88,12 @@ function updateFavicons() {
 
     const orderedKeys = JSON.parse(localStorage.getItem('shortcutOrder')) || Object.keys(localStorage);
 
-    orderedKeys.forEach(key => {
+    // Remove "mode" from the array
+    const updatedKeys = orderedKeys.filter(key => key !== "mode");//cookie from v1
+
+    updatedKeys.forEach(key => {
         const url = localStorage.getItem(key);
+    
         if (url) {
             const faviconElement = document.createElement('a');
             faviconElement.href = url;
