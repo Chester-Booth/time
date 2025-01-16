@@ -1,8 +1,16 @@
 // Utility to format time and date
 function formatTimeDate() {
     const now = new Date();
-    const time = now.toLocaleTimeString('en-US', { hour12: false });
-    const date = now.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+    let hours = now.getHours() % 12 || 12; // Convert to 12-hour format, ensuring 12:00 is displayed correctly
+    let minutes = String(now.getMinutes()).padStart(2, '0'); // Add leading zero if needed
+    let seconds = String(now.getSeconds()).padStart(2, '0'); // Add leading zero if needed
+    
+    const time = `${hours}:${minutes}:${seconds}`; // Construct the time string
+    const date = now.toLocaleDateString('en-GB', { 
+        weekday: 'long', 
+        day: 'numeric', 
+        month: 'short' 
+    }).replace(' ', ', '); // Add a comma between weekday and date
     
     document.getElementById('time').textContent = time;
     document.getElementById('date').textContent = date;
