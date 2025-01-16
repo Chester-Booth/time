@@ -13,11 +13,23 @@ function showPopup() {
     displayShortcuts();
     const popup = document.getElementById('popup');
     const background = document.getElementById('popup-background');
-    const content = document.getElementById('popup-content');
-
+    const boxes = document.getElementsByClassName('popup-boxes');
+   
+    popup.style.visibility = 'visible'; // Make popup visible
+    popup.style.opacity = '1';         // Ensure opacity is fully visible   
     popup.style.display = 'flex';
+   
+   
     background.style.animation = 'fadeIn 0.2s forwards';
-    content.style.animation = 'slideIn 0.3s forwards';
+
+    for (box of boxes) {
+        box.style.animation = 'slideIn 0.3s forwards';
+    }
+
+
+
+
+
 }
 
 // Hide popup
@@ -25,13 +37,21 @@ function hidePopup() {
     updateFavicons();
     const popup = document.getElementById('popup');
     const background = document.getElementById('popup-background');
-    const content = document.getElementById('popup-content');
+    const boxes = document.getElementsByClassName('popup-boxes');
 
     background.style.animation = 'fadeOut 0.2s forwards';
-    content.style.animation = 'slideOut 0.3s forwards';
+    
+
+    for (box of boxes) {
+        box.style.animation = 'slideOut 0.3s forwards';
+    }
+
 
     setTimeout(() => {
-        popup.style.display = 'none';
+        //popup.style.display = 'none';
+        popup.style.visibility = 'hidden'; // Make popup invisible
+        popup.style.opacity = '0';        // Fade it out visually
+
     }, 300); // Match the duration of the animations
 }
 
@@ -43,11 +63,13 @@ function saveShortcut() {
     if (key && url) {
         localStorage.setItem(key, url);
         alert(`Shortcut saved! Press '${key}' to open ${url}`);
+        //TODO: add to shortcutOrder
         hidePopup();
         
     } else if (key && !url && localStorage.getItem(key)) {
         localStorage.removeItem(key);
         alert(`Shortcut for key '${key}' has been deleted.`);
+        //TODO: remove from to shortcutOrder
         hidePopup();
         
     } else {
@@ -78,6 +100,30 @@ function displayShortcuts() {
 
             shortcutsContainer.appendChild(shortcutElement);
         }
+    });
+
+    setPopupWidth();
+    
+}
+
+function setPopupWidth(){
+    const boxes = document.querySelectorAll('.popup-boxes');
+    let maxWidth = 0;
+
+    // Find the maximum width among all boxes
+    boxes.forEach(box => {
+        const width = box.offsetWidth;
+        console.log(width);
+        if (width > maxWidth) {
+            maxWidth = width;
+        }
+    });
+
+    console.log("maxWidth: ", maxWidth);
+
+    // Apply the maximum width to all boxes
+    boxes.forEach(box => {
+        box.style.width = `${maxWidth}px`;
     });
 }
 
@@ -185,6 +231,7 @@ document.getElementById('popup-background').addEventListener('click', (event) =>
 
 
 
+
 // Update time and date every second
 setInterval(formatTimeDate, 1000);
 
@@ -192,3 +239,6 @@ setInterval(formatTimeDate, 1000);
 formatTimeDate();
 updateFavicons();
 
+window.addEventListener("load", () => {
+    displayShortcuts();
+});
