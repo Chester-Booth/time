@@ -48,9 +48,8 @@ function hidePopup() {
 
 
     setTimeout(() => {
-        //popup.style.display = 'none';
-        popup.style.visibility = 'hidden'; // Make popup invisible
-        popup.style.opacity = '0';        // Fade it out visually
+        popup.style.visibility = 'hidden'; 
+        popup.style.opacity = '0';        
 
     }, 300); // Match the duration of the animations
 }
