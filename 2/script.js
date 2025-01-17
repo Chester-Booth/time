@@ -249,3 +249,27 @@ updateFavicons();
 window.addEventListener("load", () => {
     displayShortcuts();
 });
+
+
+
+$("#BG-color-picker").spectrum({
+    color: "#121212",
+    showInput: true,
+    cancelText: "Cancel",
+    chooseText: "Select",
+    preferredFormat: "hex",
+    change: function(color) {
+    console.log("New color selected: " + color.toHexString());
+    }
+});
+
+$("#TXT-color-picker").spectrum({
+    color: "#ffffff",
+    showInput: true,
+    cancelText: "Cancel",
+    chooseText: "Select",
+    preferredFormat: "hex",
+    change: function(color) {
+    console.log("New color selected: " + color.toHexString());
+    }
+});
