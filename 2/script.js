@@ -229,6 +229,7 @@ document.getElementById('cog').addEventListener('click', showPopup);
 document.getElementById('save').addEventListener('click', saveShortcut);
 document.getElementById('close').addEventListener('click', hidePopup);
 document.getElementById('rotate').addEventListener('click', rotateContent);
+document.getElementById('reset_settings').addEventListener('click', resetColours);
 document.addEventListener('keydown', handleKeyPress);
 
 
@@ -261,9 +262,20 @@ function updateColours(){
 
     document.body.style.backgroundColor = BGColour;
     document.body.style.color = TextColour;
+
+    document.body.style.visibility = "visible";
 }
 
+function resetColours(){
 
+    localStorage.removeItem("BGColour");
+    localStorage.removeItem("TextColour");
+
+    updateColours();
+
+    $("#BG-colour-picker").spectrum("set", "#222222");
+    $("#TXT-colour-picker").spectrum("set", "#ffffff");
+}
 
     $("#BG-colour-picker").spectrum({
     color: localStorage.getItem("BGColour") || "#222222",
