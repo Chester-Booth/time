@@ -29,6 +29,7 @@
 
     <div id="popup">
         <div id="popup-background"></div>
+
         <span id="close" class="material-symbols-outlined">close</span>
 
         <div class = "popup-boxes"> 
@@ -36,12 +37,25 @@
             <hr>
             <ul>
                 <li>Change Background Colour (TBD) </li>
-                <li>Change Font (TBD) </li>
                 <li>Change Size (TBD)</li>
                 <li>Add Shortcuts</li>
                 <li>Update Shortcuts</li>
                 <LI>Remove Shortcuts (1/2 TBD)</LI>
-            </ul></div>
+            </ul>
+        </div>
+
+        <div class="popup-boxes">
+            <label>Change Colours:</label>
+                <div id="colour-pickers">
+                    <label for="Background">Background</label>
+                    <input type="color" name="Background" value="#e66465" />
+                </div>
+
+                <div id="colour-pickers">
+                    <label for="Text">Text</label>
+                    <input type="color" name="Text" value="#e66465" />
+                </div>
+        </div>  
 
         <div class = "popup-boxes">
             <label>Add:</label>
