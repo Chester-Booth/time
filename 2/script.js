@@ -14,6 +14,9 @@ function formatTimeDate() {
     
     document.getElementById('time').textContent = time;
     document.getElementById('date').textContent = date;
+
+
+    document.title = time;
 }
 
 // Show popup
