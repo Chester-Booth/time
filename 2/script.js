@@ -251,28 +251,42 @@ updateFavicons();
 
 window.addEventListener("load", () => {
     displayShortcuts();
+    updateColours();
+
 });
 
+function updateColours(){
+    const BGColour = localStorage.getItem("BGColour");
+    const TextColour = localStorage.getItem("TextColour");
+
+    document.body.style.backgroundColor = BGColour;
+    document.body.style.color = TextColour;
+}
 
 
-$("#BG-color-picker").spectrum({
-    color: "#121212",
+
+    $("#BG-colour-picker").spectrum({
+    color: localStorage.getItem("BGColour") || "#222222",
     showInput: true,
     cancelText: "Cancel",
     chooseText: "Select",
     preferredFormat: "hex",
     change: function(color) {
-    console.log("New color selected: " + color.toHexString());
+    console.log("New colour selected: " + color.toHexString());
+    localStorage.setItem("BGColour", color.toHexString());
+    updateColours();
     }
 });
 
-$("#TXT-color-picker").spectrum({
-    color: "#ffffff",
+$("#TXT-colour-picker").spectrum({
+    color: localStorage.getItem("TextColour") || "#ffffff",
     showInput: true,
     cancelText: "Cancel",
     chooseText: "Select",
     preferredFormat: "hex",
     change: function(color) {
-    console.log("New color selected: " + color.toHexString());
+    console.log("New colour selected: " + color.toHexString());
+    localStorage.setItem("TextColour", color.toHexString());
+    updateColours();
     }
 });
