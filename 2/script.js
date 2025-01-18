@@ -247,17 +247,8 @@ document.getElementById('size-range').addEventListener('input', saveSizeRange);
 document.getElementById('size-number').addEventListener('input', saveSizeNumber);
 document.getElementById('height-range').addEventListener('input', saveHeightRange);
 document.getElementById('height-number').addEventListener('input', saveHeightNumber);
-
-
 document.addEventListener('keydown', handleKeyPress);
-
-
-// Close popup when clicking outside the content
-document.getElementById('popup-background').addEventListener('click', (event) => {
-    if (event.target === document.getElementById('popup-background')) {
-        hidePopup();
-    }
-});
+document.getElementById('popup-background').addEventListener('click', (event) => { if (event.target === document.getElementById('popup-background')) { hidePopup();}});
 
 
 
