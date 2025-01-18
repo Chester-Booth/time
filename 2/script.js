@@ -93,8 +93,10 @@ function displayShortcuts() {
     shortcutsContainer.innerHTML = '';
 
     const orderedKeys = JSON.parse(localStorage.getItem('shortcutOrder')) || Object.keys(localStorage);
+    const updatedKeys = orderedKeys.filter(key => key.length == 1);//cookies from v1 and cookies for colours
 
-    orderedKeys.forEach(key => {
+
+    updatedKeys.forEach(key => {
         if (localStorage.getItem(key)) {
             const url = localStorage.getItem(key);
 
@@ -144,8 +146,7 @@ function updateFavicons() {
 
     const orderedKeys = JSON.parse(localStorage.getItem('shortcutOrder')) || Object.keys(localStorage);
 
-    // Remove "mode" from the array
-    const updatedKeys = orderedKeys.filter(key => key !== "mode");//cookie from v1
+    const updatedKeys = orderedKeys.filter(key => key.length == 1);//cookies from v1 and cookies for colours
 
     updatedKeys.forEach(key => {
         const url = localStorage.getItem(key);
