@@ -321,7 +321,7 @@ function updateText(){
     //apply changes to the time-date div
     document.getElementById('time-date').style.fontFamily = `${TextFont},Sans-serif`;
     document.getElementById('time-date').style.fontSize = TextSize;
-    document.getElementById('time').style.fontSize = TextSize*2;
+    document.getElementById('time').style.fontSize = TextSize.replace("px","")*2+"px";
     document.getElementById('time-date').style.marginTop = TextPosition;
 
     //apply changes to the font preview
