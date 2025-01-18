@@ -155,10 +155,13 @@ function updateFavicons() {
             const faviconElement = document.createElement('a');
             faviconElement.href = url;
             faviconElement.target = '_blank';
+            
+            const urlHostName = new URL(url).hostname;
 
             const faviconImg = document.createElement('img');
-            faviconImg.src = `https://www.google.com/s2/favicons?domain=${new URL(url).hostname}`;
-            faviconImg.alt = 'Favicon';
+            faviconImg.src = `https://www.google.com/s2/favicons?domain=${urlHostName}`;
+            faviconImg.title = `${key} | ${urlHostName}`;
+            faviconImg.alt = `key ${key} for ${urlHostName}`;
             faviconImg.classList.add('favicon');
 
             faviconElement.appendChild(faviconImg);
