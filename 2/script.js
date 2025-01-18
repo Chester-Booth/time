@@ -14,7 +14,7 @@ function formatTimeDate() {
     
     document.getElementById('time').textContent = time;
     document.getElementById('date').textContent = date;
-
+    document.getElementById('font-preview').textContent = `${time} ${date}`;
 
     document.title = time;
 }
@@ -30,7 +30,8 @@ function showPopup() {
     popup.style.opacity = '1';         // Ensure opacity is fully visible   
     popup.style.display = 'flex';
    
-   
+
+
     background.style.animation = 'fadeIn 0.2s forwards';
 
     for (box of boxes) {
@@ -38,8 +39,8 @@ function showPopup() {
     }
 
 
-
-
+    const cog = document.getElementById('cog');
+    cog.style.visibility = 'hidden';
 
 }
 
@@ -63,6 +64,9 @@ function hidePopup() {
         popup.style.opacity = '0';        
 
     }, 300); // Match the duration of the animations
+
+    const cog = document.getElementById('cog');
+    cog.style.visibility = 'visible';
 }
 
 // Save key and URL
@@ -74,13 +78,12 @@ function saveShortcut() {
         localStorage.setItem(key, url);
         alert(`Shortcut saved! Press '${key}' to open ${url}`);
         //TODO: add to shortcutOrder
-        hidePopup();
         
     } else if (key && !url && localStorage.getItem(key)) {
         localStorage.removeItem(key);
         alert(`Shortcut for key '${key}' has been deleted.`);
         //TODO: remove from to shortcutOrder
-        hidePopup();
+
         
     } else {
         alert('Please enter a key and optionally a URL to save, or just a key to delete its shortcut.');
@@ -125,18 +128,20 @@ function setPopupWidth(){
     // Find the maximum width among all boxes
     boxes.forEach(box => {
         const width = box.offsetWidth;
-        console.log(width);
         if (width > maxWidth) {
             maxWidth = width;
         }
     });
 
-    console.log("maxWidth: ", maxWidth);
+    maxWidth++;//add 1px to prevent wrapping
 
     // Apply the maximum width to all boxes
     boxes.forEach(box => {
         box.style.width = `${maxWidth}px`;
     });
+
+    //put text in after assigning width so it will wrap
+    document.getElementById("Text-Settings-Note").innerHTML = "Note: Font must be installed on your system and an <strong>exact match</strong> is required.";
 }
 
 // Update favicons row
@@ -230,10 +235,20 @@ function rotateContent() {
 
 // Set event listeners
 document.getElementById('cog').addEventListener('click', showPopup);
-document.getElementById('save').addEventListener('click', saveShortcut);
+document.getElementById('save-shortcuts-button').addEventListener('click', saveShortcut);
+document.getElementById('url').addEventListener('keydown', function(event) {if (event.key === 'Enter') {saveShortcut();}});
 document.getElementById('close').addEventListener('click', hidePopup);
 document.getElementById('rotate').addEventListener('click', rotateContent);
-document.getElementById('reset_settings').addEventListener('click', resetColours);
+document.getElementById('reset_settings_colours').addEventListener('click', resetColours);
+document.getElementById('reset_settings_text').addEventListener('click', resetText);
+document.getElementById('save-text-button').addEventListener('click', saveText);
+document.getElementById('font').addEventListener('keydown', function(event) {if (event.key === 'Enter') {saveText();}});
+document.getElementById('size-range').addEventListener('input', saveSizeRange);
+document.getElementById('size-number').addEventListener('input', saveSizeNumber);
+document.getElementById('height-range').addEventListener('input', saveHeightRange);
+document.getElementById('height-number').addEventListener('input', saveHeightNumber);
+
+
 document.addEventListener('keydown', handleKeyPress);
 
 
@@ -257,7 +272,8 @@ updateFavicons();
 window.addEventListener("load", () => {
     displayShortcuts();
     updateColours();
-
+    updateText();
+//Note: Font must be installed on your system and an <strong>exact match</strong> is required.
 });
 
 function updateColours(){
@@ -306,3 +322,94 @@ $("#TXT-colour-picker").spectrum({
     updateColours();
     }
 });
+function updateText(){
+    const TextFont = localStorage.getItem("TextFont");
+    const TextSize = localStorage.getItem("TextSize");
+    const TextPosition = localStorage.getItem("TextPosition");
+
+    //apply changes to the time-date div
+    document.getElementById('time-date').style.fontFamily = `${TextFont},Sans-serif`;
+    document.getElementById('time-date').style.fontSize = TextSize;
+    document.getElementById('time').style.fontSize = TextSize*2;
+    document.getElementById('time-date').style.marginTop = TextPosition;
+
+    //apply changes to the font preview
+    document.getElementById('font-preview').style.fontFamily = `${TextFont},Sans-serif`;
+    document.getElementById('font').style.fontFamily = `${TextFont},Sans-serif`;
+
+    //apply changes to the font picker
+    document.getElementById('font').value = TextFont;
+
+    //apply changes to the font size
+    document.getElementById('size-number').value = TextSize.replace("px","");
+    document.getElementById('size-range').value = TextSize.replace("px",""); 
+
+    //apply changes to the font position
+    document.getElementById('height-number').value = TextPosition.replace("vh","");
+    document.getElementById('height-range').value = TextPosition.replace("vh","");
+}
+function resetText(){
+    localStorage.setItem("TextFont","Arial");
+    localStorage.setItem("TextSize","60px");
+    localStorage.setItem("TextPosition","0vh");
+
+    updateText();
+}
+
+function saveText(){
+    const TextFont = document.getElementById('font').value;
+    localStorage.setItem("TextFont", TextFont);
+
+    updateText();
+
+}
+
+
+function saveSizeNumber(){
+    const numberInput = document.getElementById('size-number');
+    const rangeInput = document.getElementById('size-range');
+
+    rangeInput.value = numberInput.value;
+    saveSize();
+}
+
+function saveSizeRange(){
+    const numberInput = document.getElementById('size-number');
+    const rangeInput = document.getElementById('size-range');
+
+    numberInput.value = rangeInput.value;
+    saveSize();
+}
+
+function saveSize(){
+    const TextSize = document.getElementById('size-number').value;
+    localStorage.setItem("TextSize", `${TextSize}px`);
+    
+    updateText();
+}
+
+
+
+
+function saveHeightNumber(){
+    const numberInput = document.getElementById('height-number');
+    const rangeInput = document.getElementById('height-range');
+
+    rangeInput.value = numberInput.value;
+    saveHeight();
+}
+
+function saveHeightRange(){
+    const numberInput = document.getElementById('height-number');
+    const rangeInput = document.getElementById('height-range');
+
+    numberInput.value = rangeInput.value;
+    saveHeight();
+}
+
+function saveHeight(){
+    const TextPosition = document.getElementById('height-number').value;
+    localStorage.setItem("TextPosition", `${TextPosition}vh`);
+    
+    updateText();
+}

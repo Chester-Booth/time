@@ -44,24 +44,24 @@ body {
     display: flex;
     flex-direction: column;
 
-    bottom: 0;
-    right: 0;
 
 
     overflow-y: auto;
 }
 
 #popup-background {
-    position: fixed;
+    position: absolute;
     width: 100%;
     height: 100%;
+    top: 0;
+    left: 0;
     background-color: #000000;
     z-index: -1;
 }
 
 @keyframes slideIn {
     from {
-        transform: translateY(80vh);
+        transform: translateY(100vh);
     }
     to {
         transform: translateY(0);
@@ -73,7 +73,7 @@ body {
         transform: translateY(0);
     }
     to {
-        transform: translateY(80vh);
+        transform: translateY(100vh);
     }
 }
 
@@ -115,6 +115,7 @@ body {
 
 .popup-boxes label {
     font-weight: bold;
+    margin-bottom: 1px;
 }
 
 .popup-boxes h1{
@@ -123,9 +124,11 @@ body {
 }
 
 .popup-boxes input {
-    padding: 10px;
+    padding: 5px;
     border: 1px solid #ccc;
     border-radius: 5px;
+    box-sizing: border-box;
+
 }
 
 .popup-boxes span{
@@ -136,10 +139,14 @@ body {
 }
 
 #key {
-    width: 7px;
+    width: 50px;
 }
 
-#url {
+#url{
+    width: 100%;
+}
+
+#font {
     width: 100%;
 }
 
@@ -205,8 +212,48 @@ body {
     right: 10px;
 }
 
+#text-settings #reset_settings_text {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
 
 #popup-boxes-container {
     max-width: 90%; 
     overflow-y: auto; 
 }
+
+.popup-boxes .note{
+    font-size: smaller;
+    font-weight: lighter;
+    color: #666;
+}
+
+.popup-boxes .note strong {
+    font-weight: bold;
+    color: #333; 
+}
+
+#text-settings input[type="number"] {
+    width: 50px;
+    margin-right: 10px;
+}
+
+#text-settings input[type="range"] {
+    width: calc(100% - 70px);
+}
+
+
+
+
+.font-picker, .size-picker, .height-picker {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+#text-settings {
+    position: relative;
+}    
