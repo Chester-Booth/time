@@ -5,11 +5,11 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background-color: #222222;
+    background-color: #000;
     color: #ffffff;
     font-family: Arial, sans-serif;
 
-    visibility: hidden; /* Hide the body until the page is loaded */
+    
 }
 
 #container {
@@ -48,7 +48,7 @@ body {
     right: 0;
 
 
-
+    overflow-y: auto;
 }
 
 #popup-background {
@@ -203,4 +203,10 @@ body {
     position: absolute;
     top: 10px;
     right: 10px;
+}
+
+
+#popup-boxes-container {
+    max-width: 90%; 
+    overflow-y: auto; 
 }

@@ -35,58 +35,69 @@
     
 
     <div id="popup">
-        <div id="popup-background"></div>
+        <div id="popup-boxes-container">
+            <div id="popup-background"></div>
 
-        <span id="close" title="Close Settings" class="material-symbols-outlined">close</span>
+            <span id="close" title="Close Settings" class="material-symbols-outlined">close</span>
+            <!--settings-->
+            <div class = "popup-boxes"> 
+                <h1>Settings:</h1>
+                <hr>
+                <ul>
+                    <li>Change Background Colour</li>
+                    <li>Change Text Colour</li>
+                    <li>Change Size (TBD)</li>
+                    <li>Add Shortcuts</li>
+                    <li>Update Shortcuts</li>
+                    <LI>Remove Shortcuts (1/2 TBD)</LI>
+                </ul>
+            </div>
 
-        <div class = "popup-boxes"> 
-            <h1>Settings:</h1>
-            <hr>
-            <ul>
-                <li>Change Background Colour</li>
-                <li>Change Text Colour</li>
-                <li>Change Size (TBD)</li>
-                <li>Add Shortcuts</li>
-                <li>Update Shortcuts</li>
-                <LI>Remove Shortcuts (1/2 TBD)</LI>
-            </ul>
-        </div>
+            <!--colour pickers-->
+            <div class="popup-boxes" id="colour-settings">
+                <label>Change Colours:</label>
+                    <div id="colour-pickers">
+                        <label for="Background">Background</label>
+                        <input type='text' id="BG-colour-picker" />
+                    </div>
 
-        <div class="popup-boxes" id="colour-settings">
-            <label>Change Colours:</label>
-                <div id="colour-pickers">
-                    <label for="Background">Background</label>
-                    <input type='text' id="BG-colour-picker" />
+                    <div id="colour-pickers">
+                        <label for="Text">Text</label>
+                        <input type='text' id="TXT-colour-picker" />
+                    </div>
+                    
+                    <span id="reset_settings" title="Reset Colours to Defualt" class="material-symbols-outlined">reset_settings</span>
+            </div>  
+
+            <!--text-->
+            <div class="popup-boxes" id="text-settings">
+                <label>Change Text:</label>
+                <div id="text-pickers">
+                    <label for="Font">Font</label>
+                    <input type="text" id="font">
+                </div>
+                <div id="text-pickers">
+                    <label for="Size">Size</label>
+                    <input type="text" id="size">
+                </div>
+            </div>  
+
+            <!--shortcuts-->
+            <div class = "popup-boxes">
+                <label>Add:</label>
+                
+                <div id="add-shortcut">
+                    <input type="text" id="key" maxlength="1">
+                    <input type="text" id="url">        
+                    <span id="save" title="Save Shortcut key and URL" class="material-symbols-outlined">save</span>
+                </div>
+                <hr>
+                <label>Customise </label>
+                <div id="saved-shortcuts"></div>
+                <div class="popup-buttons">
+                    
                     
                 </div>
-
-                <div id="colour-pickers">
-                    <label for="Text">Text</label>
-                    <input type='text' id="TXT-colour-picker" />
-                </div>
-                
-                <span id="reset_settings" title="Reset Colours to Defualt" class="material-symbols-outlined">reset_settings</span>
-
-
-                
-
-
-        </div>  
-
-        <div class = "popup-boxes">
-            <label>Add:</label>
-            
-            <div id="add-shortcut">
-                <input type="text" id="key" maxlength="1">
-                <input type="text" id="url">        
-                <span id="save" title="Save Shortcut key and URL" class="material-symbols-outlined">save</span>
-            </div>
-            <hr>
-            <label>Customise </label>
-            <div id="saved-shortcuts"></div>
-            <div class="popup-buttons">
-                
-                
             </div>
         </div>
     </div>
