@@ -159,7 +159,7 @@ function updateFavicons() {
         if (url) {
             const faviconElement = document.createElement('a');
             faviconElement.href = url;
-            faviconElement.target = '_blank';
+            faviconElement.target = '_self';
             
             const urlHostName = new URL(url).hostname;
 
