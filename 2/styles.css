@@ -139,7 +139,7 @@ body {
 }
 
 #key {
-    width: 50px;
+    width: 60px;
 }
 
 #url{
@@ -236,7 +236,7 @@ body {
 }
 
 #text-settings input[type="number"] {
-    width: 50px;
+    width: 60px;
     margin-right: 10px;
 }
 
