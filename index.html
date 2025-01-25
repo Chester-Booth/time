@@ -1,293 +1,115 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <link href="https://fonts.googleapis.com/css?family=Zilla+Slab&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-    <title>Time</title>
-    <style>
-        body {
-            transition: background-color 1.0s, color 1.0s;
-            background-color: #222;
-            color: #f0f0f0;
-        }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=close,reset_settings,rotate_left,save,settings" />
 
-        #date {
-            text-align: center;
-            font-size: 50px;
-            margin-top: 15%;
-            margin-bottom: -1%;
-            font-family: "Monument Extended","Zilla Slab", serif;
-        }
-
-        #clock {
-            font-size: 120px;
-            text-align: center;
-            font-family: "Monument Extended","Zilla Slab", serif;
-        }
-
-        #mode {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            cursor: pointer;
-        }
-
-            #mode i {
-                font-size: 24px;
-            }
+    <link rel="stylesheet" href="../spectrum/spectrum.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="../spectrum/spectrum.js"></script>
 
 
-        .dark-mode {
-            background-color: #f0f0f0;
-            color: #333;
-        }
 
-        #settings-icon {
-            position: absolute;
-            top: 10px;
-            right: 50px;
-            cursor: pointer;
-        }
-
-            #settings-icon i {
-                font-size: 24px;
-            }
-
-
-        @media screen and (max-width: 800px) {
-                #mode i {
-                    font-size: 10vw;
-                }
-
-                #settings-icon i {
-                    font-size: 10vw;
-                    margin-right:5vw;
-                }
-        }
-
-
-        .rotate {
-            transform: rotate(90deg);
-            transition: .7s ease-in-out
-        }
-
-        .rotate-back {
-            transform: rotate(-90deg);
-            transition: .7s ease-in-out
-        }
-
-        #settings {
-            transition: background-color 1.0s, color 1.0s;
-            display: none;
-            position: fixed;
-            top: 50px;
-            right: 10px;
-            background-color: #444;
-            border-radius: 5px;
-            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
-            padding: 20px;
-            font-family: "Zilla Slab", sans-serif;
-        }
-
-        #clock:hover {
-            transform: translate(-500,-100);
-            transition: 1s
-        }
-
-        .dark-mode #settings {
-            background-color: #E0E0E0;
-        }
-
-        #settings label {
-            transition: background-color 1.0s, color 1.0s;
-            display: block;
-        }
-
-        #settings input {
-            width: 97%;
-            margin-bottom: 20px;
-        }
-
-/*            #settings input[type="text"] {
-            }
-
-        .dark-mode input[type="text"] {
-            background-color: #444;
-        }*/
-
-            .dark-mode input[type="text"]:focus {
-                outline: none;
-            }
-
-        input[type="text"]:focus {
-            outline: none;
-        }
-
-        button {
-            padding: .5em .75em;
-            width: 100%;
-        }
-
-        .disable-transition * {
-            transition: none !important;
-        }
-    </style>
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-
-            let mode = localStorage.getItem('mode');
-            if (mode === 'dark') {
-                document.body.classList.add('disable-transition');
-                document.body.classList.add('dark-mode');
-                let icon = document.querySelector("#mode i");
-                icon.classList.remove('fa-sun');
-                icon.classList.add('fa-moon');
-            } else if (mode === 'light') {
-                document.body.classList.add('disable-transition');
-                document.body.classList.remove('dark-mode');
-                let icon = document.querySelector("#mode i");
-                icon.classList.remove('fa-moon');
-                icon.classList.add('fa-sun');
-            }
-
-            setTimeout(function () {
-                document.body.classList.remove('disable-transition');
-            }, 100);
-
-        });
-    </script>
 </head>
-<body onload="loadSettings()">
-    
-    <div id="date"></div>
-    <div id="clock"></div>
-    <div id="mode"><i class="fas fa-sun"></i></div>
-    <div id="settings-icon"><i class="fas fa-cog"></i></div>
-    <div id="settings">
-        <label for="site1">Site 1:</label>
-        <input type="text" id="site1">
-        <label for="site2">Site 2:</label>
-        <input type="text" id="site2">
-        <label for="site3">Site 3:</label>
-        <input type="text" id="site3">
-        <button id="save">Save</button>
+<body>
+    <div id="container">
+        <div id="time-date">
+            <div id="time">00:00:00</div>
+            <div id="date">Monday Jan 01</div>
+            <div id="favicons"></div>
+        </div>
     </div>
 
-    <script>
 
-        function displayTime() {
-            let date = new Date();
+    <div id="controls" class="top-right">
+        <span id="rotate" class="material-symbols-outlined">
+            rotate_left
+            </span>        
+        <span id="cog" class="material-symbols-outlined">
+            settings
+        </span>
+    </div>
+    
 
-            let options = { weekday: 'long', month: 'short', day: 'numeric' };
-            let dateString = date.toLocaleDateString('en-US', options);
-            document.getElementById("date").textContent = dateString;
+    <div id="popup">
+        <div id="popup-boxes-container">
+            <div id="popup-background"></div>
 
-            /*let timeString = date.toLocaleTimeString();*/
-			let timeOptions = { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' };
-            let timeString = date.toLocaleTimeString('en-US', timeOptions);
-            timeString = timeString.replace(/(AM|PM)/, '');
- 
-            document.getElementById("clock").textContent = timeString;
-            document.title = timeString;
-        }
+            <span id="close" title="Close Settings" class="material-symbols-outlined">close</span>
+            <!--settings-->
+            <div class = "popup-boxes"> 
+                <h1>Settings:</h1>
+                    <LI>Remove Shortcuts (1/2 TBD)</LI>
+            </div>
 
-        displayTime();
-        const createClock = setInterval(displayTime, 1000);
+            <!--colour pickers-->
+            <div class="popup-boxes" id="colour-settings">
+                <label>Change Colours:</label>
+                    <div id="colour-pickers">
+                        <label for="Background">Background</label>
+                        <input type='text' id="BG-colour-picker" />
+                    </div>
 
-        document.getElementById("mode").addEventListener("click", function () {
-            document.body.classList.toggle("dark-mode");
-            let icon = document.querySelector("#mode i");
-            if (icon.classList.contains("fa-sun")) {
-                icon.classList.remove("fa-sun");
-                icon.classList.add("fa-moon");
-                localStorage.setItem('mode', 'dark');
-            } else {
-                icon.classList.remove("fa-moon");
-                icon.classList.add("fa-sun");
-                localStorage.setItem('mode', 'light');
-            }
-        });
+                    <div id="colour-pickers">
+                        <label for="Text">Text</label>
+                        <input type='text' id="TXT-colour-picker" />
+                    </div>
+                    
+                    <span id="reset_settings_colours" title="Reset Colours to Defualt" class="material-symbols-outlined">reset_settings</span>
+            </div>  
 
-        document.getElementById("settings-icon").addEventListener("click", function () {
-            let settings = document.getElementById("settings");
-            if (settings.style.display === "none") {
-                settings.style.display = "block";
-                settings.style.right = '-300px';
-                setTimeout(function () {
-                    settings.style.transition = 'right 0.5s ease-in-out';
-                    settings.style.right = '10px';
-                }, 50)
-                loadSettings();
-                this.querySelector('i').classList.add('rotate')
-                this.querySelector('i').classList.remove('rotate-back')
-            } else {
-                settings.style.right = '10px';
-                setTimeout(function () {
-                    settings.style.transition = 'right 0.5s ease-in-out';
-                    settings.style.right = '-300px';
-                }, 50)
-                setTimeout(function () {
-                    settings.style.display = 'none';
-                    settings.style.transition = 'none';
-                }, 500)
-                this.querySelector('i').classList.remove('rotate')
-                this.querySelector('i').classList.add('rotate-back')
-            }
-        });
+            <!--text-->
+            <div class="popup-boxes" id="text-settings">
+                <label>Change Text:</label>
+                <div id="text-pickers">
+                    <label for="Font">Font:</label>
+                    <div class="font-picker">
+                        <input type="text" id="font">
+                        <span id="save-text-button" title="Save font name" class="material-symbols-outlined">save</span>
+                    </div>
+                    <p id="font-preview">Preview</p>
+                    <div class="note" id="Text-Settings-Note"> Note:</div>
+                </div>
+                <div id="text-pickers">
+                    <label for="Size">Size:</label>
+                    <div class="size-picker">
+                        <input type="number" id="size-number" min="0.1" max="20" step="0.1" >
+                        <input type="range" id="size-range" min="0.1" max="20" step="0.1" >
+                    </div>
+                </div>
+                <div id="text-pickers">
+                    <label for="Height">Height:</label>
+                    <div class="height-picker">
+                        <input type="number" id="height-number" min="-100" max="100">
+                        <input type="range" id="height-range" min="-100" max="100">
+                    </div>
+                </div>
+                <span id="reset_settings_text" title="Reset Text Settings to Default" class="material-symbols-outlined">reset_settings</span>
+            </div>
+            
+            <!--shortcuts-->
+            <div class = "popup-boxes">
+                <label>Add:</label>
+                
+                <div id="add-shortcut">
+                    <input type="text" id="key" maxlength="1" placeholder="Key">
+                    <input type="text" id="url" placeholder="URL">        
+                    <span id="save-shortcuts-button" title="Save Shortcut key and URL" class="material-symbols-outlined">save</span>
+                </div>
+                <hr>
+                <label>Customise </label>
+                <div id="saved-shortcuts"></div>
+                <div class="popup-buttons">
+                    
+                    
+                </div>
+            </div>
+        </div>
+    </div>
 
-        document.getElementById("save").addEventListener("click", function () {
-            saveSettings();
-            alert("Settings saved!");
-            document.getElementById("settings")//.style.display = "none";
-            loadSettings();
-
-
-
-        });
-
-        function saveSettings() {
-            let site1 = document.getElementById("site1").value;
-            let site2 = document.getElementById("site2").value;
-            let site3 = document.getElementById("site3").value;
-
-            localStorage.setItem("site1", site1);
-            localStorage.setItem("site2", site2);
-            localStorage.setItem("site3", site3);
-        }
-
-        function loadSettings() {
-            let site1 = localStorage.getItem("site1");
-            let site2 = localStorage.getItem("site2");
-            let site3 = localStorage.getItem("site3");
-
-            if (site1) {
-                document.getElementById("site1").value = site1;
-            }
-            if (site2) {
-                document.getElementById("site2").value = site2;
-            }
-            if (site3) {
-                document.getElementById("site3").value = site3;
-            }
-
-        }
-
-        window.addEventListener('keydown', function (event) {
-            if (event.keyCode === 49) { // key code for "1"
-                window.open(localStorage.getItem('site1'), '_blank');
-                window.close();
-            } else if (event.keyCode === 50) { // key code for "2"
-                window.open(localStorage.getItem('site2'), '_blank');
-                window.close();
-            } else if (event.keyCode === 51) { // key code for "3"
-                window.open(localStorage.getItem('site3'), '_blank');
-                window.close();
-            }
-        });
-
-        loadSettings();
-
-    </script>
-
+    <script src="script.js"></script>
 </body>
 </html>
