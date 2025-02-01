@@ -69,68 +69,144 @@ function hidePopup() {
     cog.style.visibility = 'visible';
 }
 
-// Save key and URL
+
 function saveShortcut() {
     const key = document.getElementById('key').value;
     const url = document.getElementById('url').value;
-
+  
     if (key && url) {
-        localStorage.setItem(key, url);
-        alert(`Shortcut saved! Press '${key}' to open ${url}`);
-
-        // Add to shortcutOrder
-        const shortcutOrder = JSON.parse(localStorage.getItem('shortcutOrder')) || [];
-        if (!shortcutOrder.includes(key)) {
-            shortcutOrder.push(key);
-            localStorage.setItem('shortcutOrder', JSON.stringify(shortcutOrder));
-        }
-        
-    } else if (key && !url && localStorage.getItem(key)) {
-        localStorage.removeItem(key);
-        alert(`Shortcut for key '${key}' has been deleted.`);
-       
-        // Remove from shortcutOrder
-        let shortcutOrder = JSON.parse(localStorage.getItem('shortcutOrder')) || [];
-        shortcutOrder = shortcutOrder.filter(k => k !== key);
+      localStorage.setItem(key, url);
+      
+  
+      // Add to shortcutOrder
+      const shortcutOrder = JSON.parse(localStorage.getItem('shortcutOrder')) || [];
+      if (!shortcutOrder.includes(key)) {
+        shortcutOrder.push(key);
         localStorage.setItem('shortcutOrder', JSON.stringify(shortcutOrder));
 
+        displayShortcuts()
+        alert(`Shortcut saved! Press '${key}' to open ${url}`);
+      }
+    } else if (key && !url && localStorage.getItem(key)) {
+      localStorage.removeItem(key);
         
-    } else {
-        alert('Please enter a key and optionally a URL to save, or just a key to delete its shortcut.');
-    }
-}
+      // Remove from shortcutOrder
+      let shortcutOrder = JSON.parse(localStorage.getItem('shortcutOrder')) || [];
+      shortcutOrder = shortcutOrder.filter(k => k !== key);
+      localStorage.setItem('shortcutOrder', JSON.stringify(shortcutOrder));
 
-// Display saved shortcuts in the popup
+      displayShortcuts()
+      alert(`Shortcut for key '${key}' has been deleted.`);
+
+      
+    } else {
+      alert('Please enter a key and optionally a URL to save, or just a key to delete its shortcut.');
+    }
+  }
+  
+// Display saved shortcuts in the popup with editable key and URL inputs,
 function displayShortcuts() {
     const shortcutsContainer = document.getElementById('saved-shortcuts');
     shortcutsContainer.innerHTML = '';
-
-    const orderedKeys = JSON.parse(localStorage.getItem('shortcutOrder')) || Object.keys(localStorage);
-    const updatedKeys = orderedKeys.filter(key => key.length == 1);//cookies from v1 and cookies for colours
-
-
-    updatedKeys.forEach(key => {
-        if (localStorage.getItem(key)) {
-            const url = localStorage.getItem(key);
-
-            const shortcutElement = document.createElement('div');
-            shortcutElement.classList.add('shortcut');
-            shortcutElement.setAttribute('draggable', 'true');
-            shortcutElement.dataset.key = key;
-            shortcutElement.textContent = `${key}: ${url}`;
-
-            shortcutElement.addEventListener('dragstart', handleDragStart);
-            shortcutElement.addEventListener('dragover', handleDragOver);
-            shortcutElement.addEventListener('drop', handleDrop);
-
-            shortcutsContainer.appendChild(shortcutElement);
-        }
+  
+    const orderedKeys = JSON.parse(localStorage.getItem('shortcutOrder')) || [];
+    // Filter keys to include only single-character shortcuts (as before)
+    const updatedKeys = orderedKeys.filter(key => key.length === 1);
+  
+    updatedKeys.forEach(originalKey => {
+      const url = localStorage.getItem(originalKey);
+      if (url) {
+        // Create container element for the shortcut row
+        const shortcutElement = document.createElement('div');
+        shortcutElement.classList.add('shortcut');
+        // Store the current key in the element’s dataset (for later updates)
+        shortcutElement.dataset.key = originalKey;
+  
+        // Create editable input for the key
+        const keyInput = document.createElement('input');
+        keyInput.type = 'text';
+        keyInput.classList.add('shortcut-key');
+        keyInput.value = originalKey;
+        keyInput.placeholder = '#';
+        keyInput.maxLength = 1;
+        // When the key input is changed, update storage and the order
+        keyInput.addEventListener('change', function (e) {
+          const newKey = e.target.value.trim();
+          const oldKey = shortcutElement.dataset.key;
+          if (newKey && newKey !== oldKey) {
+            updateShortcutKey(oldKey, newKey);
+            // Update the dataset so future events use the new key
+            shortcutElement.dataset.key = newKey;
+          }
+        });
+  
+        // Create editable input for the URL
+        const urlInput = document.createElement('input');
+        urlInput.type = 'text';
+        urlInput.classList.add('shortcut-url');
+        urlInput.value = url;
+        urlInput.placeholder = 'URL';
+        // When the URL input is changed, update storage
+        urlInput.addEventListener('change', function (e) {
+          const newUrl = e.target.value.trim();
+          const key = shortcutElement.dataset.key;
+          if (newUrl) {
+            localStorage.setItem(key, newUrl);
+            updateFavicons();
+          }
+        });
+  
+        // Create up arrow for reordering
+        const upArrow = document.createElement('span');
+        upArrow.classList.add('material-symbols-outlined', 'reorder-btn');
+        upArrow.textContent = 'arrow_upward';
+        upArrow.title = 'Move Up';
+        upArrow.addEventListener('click', (e) => {
+          e.stopPropagation();
+          reorderShortcut(shortcutElement.dataset.key, 'up');
+        });
+  
+        // Create down arrow for reordering
+        const downArrow = document.createElement('span');
+        downArrow.classList.add('material-symbols-outlined', 'reorder-btn');
+        downArrow.textContent = 'arrow_downward';
+        downArrow.title = 'Move Down';
+        downArrow.addEventListener('click', (e) => {
+          e.stopPropagation();
+          reorderShortcut(shortcutElement.dataset.key, 'down');
+        });
+  
+        // Create delete icon to remove the shortcut
+        const deleteBtn = document.createElement('span');
+        deleteBtn.classList.add('material-symbols-outlined', 'delete-btn');
+        deleteBtn.textContent = 'delete';
+        deleteBtn.title = 'Delete Shortcut';
+        deleteBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const key = shortcutElement.dataset.key;
+          deleteShortcut(key);
+        });
+  
+        // Append the inputs and buttons to the shortcut container
+        shortcutElement.appendChild(keyInput);
+        shortcutElement.appendChild(urlInput);
+        shortcutElement.appendChild(upArrow);
+        shortcutElement.appendChild(downArrow);
+        shortcutElement.appendChild(deleteBtn);
+  
+        // Optional: add drag-and-drop support as before
+        shortcutElement.setAttribute('draggable', 'true');
+        shortcutElement.addEventListener('dragstart', handleDragStart);
+        shortcutElement.addEventListener('dragover', handleDragOver);
+        shortcutElement.addEventListener('drop', handleDrop);
+  
+        shortcutsContainer.appendChild(shortcutElement);
+      }
     });
-
+  
     setPopupWidth();
-    
-}
-
+  }
+  
 function setPopupWidth(){
     const boxes = document.querySelectorAll('.popup-boxes');
     let maxWidth = 0;
@@ -189,35 +265,80 @@ function updateFavicons() {
         }
     });
 }
-
-// Drag and drop functionality
-function handleDragStart(event) {
+// Helper to update a shortcut’s key (changing both the localStorage and the order array)
+function updateShortcutKey(oldKey, newKey) {
+    const url = localStorage.getItem(oldKey);
+    if (!url) return;
+    // Remove the old key and store the URL under the new key
+    localStorage.removeItem(oldKey);
+    localStorage.setItem(newKey, url);
+  
+    // Update the shortcutOrder array
+    let shortcutOrder = JSON.parse(localStorage.getItem('shortcutOrder')) || [];
+    const index = shortcutOrder.indexOf(oldKey);
+    if (index !== -1) {
+      shortcutOrder[index] = newKey;
+      localStorage.setItem('shortcutOrder', JSON.stringify(shortcutOrder));
+    }
+    updateFavicons();
+  }
+  
+  // Helper to delete a shortcut (removes both the localStorage item and its order)
+  function deleteShortcut(key) {
+    localStorage.removeItem(key);
+    let shortcutOrder = JSON.parse(localStorage.getItem('shortcutOrder')) || [];
+    shortcutOrder = shortcutOrder.filter(k => k !== key);
+    localStorage.setItem('shortcutOrder', JSON.stringify(shortcutOrder));
+    displayShortcuts();
+    updateFavicons();
+  }
+  
+  // Reordering function remains the same as before:
+  function reorderShortcut(key, direction) {
+    const orderedKeys = JSON.parse(localStorage.getItem('shortcutOrder')) || [];
+    const index = orderedKeys.indexOf(key);
+    if (index === -1) return;
+    if (direction === 'up' && index > 0) {
+      [orderedKeys[index - 1], orderedKeys[index]] = [orderedKeys[index], orderedKeys[index - 1]];
+    } else if (direction === 'down' && index < orderedKeys.length - 1) {
+      [orderedKeys[index], orderedKeys[index + 1]] = [orderedKeys[index + 1], orderedKeys[index]];
+    }
+    localStorage.setItem('shortcutOrder', JSON.stringify(orderedKeys));
+    displayShortcuts();
+    updateFavicons();
+  } 
+  
+  // Drag and drop functionality remains the same
+  function handleDragStart(event) {
     event.dataTransfer.setData('text/plain', event.target.dataset.key);
-}
-
-function handleDragOver(event) {
+  }
+  
+  function handleDragOver(event) {
     event.preventDefault();
-}
-
-function handleDrop(event) {
+  }
+  
+  function handleDrop(event) {
     event.preventDefault();
     const draggedKey = event.dataTransfer.getData('text/plain');
-    const targetKey = event.target.dataset.key;
-
+    // Using closest() to ensure we get the correct element in case an arrow was the target
+    const targetElement = event.target.closest('.shortcut');
+    if (!targetElement) return;
+    const targetKey = targetElement.dataset.key;
+  
     if (draggedKey && targetKey && draggedKey !== targetKey) {
-        const orderedKeys = JSON.parse(localStorage.getItem('shortcutOrder')) || Object.keys(localStorage);
-        const draggedIndex = orderedKeys.indexOf(draggedKey);
-        const targetIndex = orderedKeys.indexOf(targetKey);
-
-        if (draggedIndex > -1 && targetIndex > -1) {
-            orderedKeys.splice(draggedIndex, 1);
-            orderedKeys.splice(targetIndex, 0, draggedKey);
-            localStorage.setItem('shortcutOrder', JSON.stringify(orderedKeys));
-            displayShortcuts();
-            updateFavicons();
-        }
+      const orderedKeys = JSON.parse(localStorage.getItem('shortcutOrder')) || [];
+      const draggedIndex = orderedKeys.indexOf(draggedKey);
+      const targetIndex = orderedKeys.indexOf(targetKey);
+  
+      if (draggedIndex > -1 && targetIndex > -1) {
+        orderedKeys.splice(draggedIndex, 1);
+        orderedKeys.splice(targetIndex, 0, draggedKey);
+        localStorage.setItem('shortcutOrder', JSON.stringify(orderedKeys));
+        displayShortcuts();
+        updateFavicons();
+      }
     }
-}
+  }
 
 // Handle key press
 function handleKeyPress(event) {
