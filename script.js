@@ -77,12 +77,22 @@ function saveShortcut() {
     if (key && url) {
         localStorage.setItem(key, url);
         alert(`Shortcut saved! Press '${key}' to open ${url}`);
-        //TODO: add to shortcutOrder
+
+        // Add to shortcutOrder
+        const shortcutOrder = JSON.parse(localStorage.getItem('shortcutOrder')) || [];
+        if (!shortcutOrder.includes(key)) {
+            shortcutOrder.push(key);
+            localStorage.setItem('shortcutOrder', JSON.stringify(shortcutOrder));
+        }
         
     } else if (key && !url && localStorage.getItem(key)) {
         localStorage.removeItem(key);
         alert(`Shortcut for key '${key}' has been deleted.`);
-        //TODO: remove from to shortcutOrder
+       
+        // Remove from shortcutOrder
+        let shortcutOrder = JSON.parse(localStorage.getItem('shortcutOrder')) || [];
+        shortcutOrder = shortcutOrder.filter(k => k !== key);
+        localStorage.setItem('shortcutOrder', JSON.stringify(shortcutOrder));
 
         
     } else {
