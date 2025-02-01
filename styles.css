@@ -130,12 +130,7 @@ body {
     cursor: pointer;
   }
   
-  /* Group the colour picker inputs */
-  .input-group {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-  }
+
   
 /* Style for each shortcut container in the popup */
 .shortcut {
