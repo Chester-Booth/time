@@ -344,7 +344,7 @@ function updateShortcutKey(oldKey, newKey) {
 function handleKeyPress(event) {
     const key = event.key;
     const url = localStorage.getItem(key);
-    const popupVisible = document.getElementById('popup').style.display === 'flex';
+    const popupVisible = document.getElementById('popup').style.opacity === '1';
 
     if (!popupVisible && url) {
         window.open(url, '_blank');
