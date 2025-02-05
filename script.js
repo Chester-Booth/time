@@ -249,8 +249,26 @@ function updateFavicons() {
             
             const urlHostName = new URL(url).hostname;
 
-            const faviconImg = document.createElement('img');
-            faviconImg.src = `https://www.google.com/s2/favicons?domain=${urlHostName}`;
+           const faviconImg = document.createElement('img');
+            //try default favicon location
+            const testFavicon = new Image();
+            testFavicon.src = `https://${urlHostName}/favicon.ico`;
+            
+            testFavicon.onload = () => {
+                faviconImg.src = testFavicon.src;
+            };
+            
+            testFavicon.onerror = () => {
+                if (urlHostName === "calendar.google.com") {
+                    // Special case for Google Calendar favicon
+                    const currentDay = new Date().getDate();
+                    faviconImg.src = `https://calendar.google.com/googlecalendar/images/favicons_2020q4/calendar_${currentDay}.ico`;
+                } else {
+                    // Default fallback to Google S2 favicon service
+                    console.warn(`Favicon not found for ${urlHostName}.`);
+                    faviconImg.src = `https://www.google.com/s2/favicons?domain=${urlHostName}`;
+                }
+            };
             faviconImg.title = `${key} | ${urlHostName}`;
             faviconImg.alt = `key ${key} for ${urlHostName}`;
             faviconImg.classList.add('favicon');
