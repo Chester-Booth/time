@@ -450,6 +450,8 @@ function resetColours(){
     }
 });
 
+//TODO: detect when colour picker input type="text" changed and assign that 
+
 $("#TXT-colour-picker").spectrum({
     color: localStorage.getItem("TextColour") || "#ffffff",
     showInput: true,
