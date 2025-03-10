@@ -481,17 +481,17 @@ function updateText(){
     document.getElementById('font').value = TextFont;
 
     //apply changes to the font size
-    document.getElementById('size-number').value = TextSize.replace("vw","");
-    document.getElementById('size-range').value = TextSize.replace("vw",""); 
+    document.getElementById('size-number').value = TextSize.replace("px","");
+    document.getElementById('size-range').value = TextSize.replace("px",""); 
 
     //apply changes to the font position
-    document.getElementById('height-number').value = TextPosition.replace("vh","");
-    document.getElementById('height-range').value = TextPosition.replace("vh","");
+    document.getElementById('height-number').value = TextPosition.replace("px","");
+    document.getElementById('height-range').value = TextPosition.replace("px","");
 }
 function resetText(){
     localStorage.setItem("TextFont","Arial");
-    localStorage.setItem("TextSize","2.5vw");
-    localStorage.setItem("TextPosition","0vh");
+    localStorage.setItem("TextSize","60px");
+    localStorage.setItem("TextPosition","0px");
 
     updateText();
 }
@@ -523,7 +523,7 @@ function saveSizeRange(){
 
 function saveSize(){
     const TextSize = document.getElementById('size-number').value;
-    localStorage.setItem("TextSize", `${TextSize}vw`);
+    localStorage.setItem("TextSize", `${TextSize}px`);
     
     updateText();
 }
@@ -549,7 +549,7 @@ function saveHeightRange(){
 
 function saveHeight(){
     const TextPosition = document.getElementById('height-number').value;
-    localStorage.setItem("TextPosition", `${TextPosition}vh`);
+    localStorage.setItem("TextPosition", `${TextPosition}px`);
     
     updateText();
 }
