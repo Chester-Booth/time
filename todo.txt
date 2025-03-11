@@ -1,4 +1,0 @@
-- [ ] make the popup in spectrum.css look nice and match
-- [ ] add input field next to the colour picker that allows hex input directl, rmeove from spectrum
-- [ ] exporting/inporting setings
-- [ ] favicons in shortcuts customisation

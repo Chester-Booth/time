@@ -1,0 +1,9 @@
+- [ ] make the popup in spectrum.css look nice and match
+- [ ] add input field next to the colour picker that allows hex input directly
+- [ ] exporting/importing setings
+- [ ] favicons in shortcuts customisation
+- [ ] adjustable ratio of title to subtitle
+- [ ] adjustable size of favicon row
+    - [ ] width
+    - [ ] num of elements in a line 
+    - [ ] enable/disable shortcuts appearing on favicon row
