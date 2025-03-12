@@ -194,7 +194,7 @@ function displayShortcuts() {
         shortcutElement.appendChild(downArrow);
         shortcutElement.appendChild(deleteBtn);
   
-        // Optional: add drag-and-drop support as before
+        // add drag-and-drop support as before
         shortcutElement.setAttribute('draggable', 'true');
         shortcutElement.addEventListener('dragstart', handleDragStart);
         shortcutElement.addEventListener('dragover', handleDragOver);
@@ -203,14 +203,36 @@ function displayShortcuts() {
         shortcutsContainer.appendChild(shortcutElement);
       }
     });
-  
+    
+    updateUrlInputWidth();
     setPopupWidth();
   }
   
+  //set width of url inputs to fit text content
+function updateUrlInputWidth(){
+  const urlInputs = document.querySelectorAll('.shortcut input.shortcut-url')
+  urlInputs.forEach(input=>{
+    //create temporary span for measurement
+    const span=document.createElement('span')
+    span.style.visibility='hidden'
+    span.style.whiteSpace='nowrap'
+    span.style.font=window.getComputedStyle(input).font
+    span.textContent=input.value||input.placeholder
+    document.body.appendChild(span)
+    //measure text width and add extra padding
+    const width=span.offsetWidth+20
+    input.style.width=width+'px'
+    document.body.removeChild(span)
+  })
+}
+
+
 function setPopupWidth(){
     const boxes = document.querySelectorAll('.popup-boxes');
     let maxWidth = 0;
 
+    
+    
     // Find the maximum width among all boxes
     boxes.forEach(box => {
         const width = box.offsetWidth;
@@ -221,7 +243,7 @@ function setPopupWidth(){
 
     maxWidth++;//add 1px to prevent wrapping
 
-    // Apply the maximum width to all boxes
+    // Apply the maximum width to **all** boxes
     boxes.forEach(box => {
         box.style.width = `${maxWidth}px`;
     });

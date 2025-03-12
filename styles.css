@@ -158,8 +158,10 @@ body {
     padding: 5px;
     border: 1px solid #ccc;
     border-radius: 5px;
+    min-width: max-content;
   }
   
+
   /* Reorder and delete buttons styling */
   .reorder-btn,
   .delete-btn {
