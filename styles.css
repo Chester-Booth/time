@@ -72,6 +72,9 @@ body {
   background: var(--control-bg);
   color: inherit;
   cursor: pointer;
+  font-family: Arial, sans-serif;
+  font-size: 22px;
+  font-weight: 700;
   line-height: 1;
 }
 

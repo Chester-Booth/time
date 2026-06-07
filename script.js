@@ -110,6 +110,7 @@ function showPopup() {
   for (const box of elements.popupBoxes) {
     box.style.animation = "slideIn 0.25s forwards";
   }
+  elements.close.style.animation = "slideIn 0.25s forwards";
 
   elements.cog.style.visibility = "hidden";
   elements.close.focus();
@@ -122,6 +123,7 @@ function hidePopup() {
   for (const box of elements.popupBoxes) {
     box.style.animation = "slideOut 0.2s forwards";
   }
+  elements.close.style.animation = "slideOut 0.2s forwards";
 
   window.setTimeout(() => {
     elements.popup.style.visibility = "hidden";

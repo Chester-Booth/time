@@ -1,0 +1,15 @@
+{
+  "manifest_version": 2,
+  "name": "Time New Tab",
+  "version": "1.0.0",
+  "description": "A minimal clock new tab page with custom colours, text settings, and keyboard shortcuts.",
+  "chrome_url_overrides": {
+    "newtab": "index.html"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "time-new-tab@local"
+    }
+  },
+  "content_security_policy": "script-src 'self'; object-src 'self';"
+}
