@@ -286,8 +286,8 @@ function updateFavicons() {
 
 function faviconUrlFor(hostname) {
   if (hostname === "calendar.google.com") {
-    const currentDay = new Date().getDate();
-    return `https://calendar.google.com/googlecalendar/images/favicons_2020q4/calendar_${currentDay}.ico`;
+    const currentDay = String(new Date().getDate()).padStart(2, "0");
+    return `https://www.gstatic.com/images/branding/productlogos/calendar_2026_${currentDay}/v2/ico/calendar_2026_${currentDay}_32dp.ico`;
   }
 
   return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(hostname)}&sz=64`;
