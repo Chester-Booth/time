@@ -1,579 +1,538 @@
-// Utility to format time and date
+const DEFAULTS = {
+  bgColour: "#111111",
+  textColour: "#ffffff",
+  textFont: "Arial",
+  textSize: 60,
+  textPosition: 0,
+};
+
+const elements = {
+  time: document.getElementById("time"),
+  date: document.getElementById("date"),
+  timeDate: document.getElementById("time-date"),
+  favicons: document.getElementById("favicons"),
+  popup: document.getElementById("popup"),
+  popupBackground: document.getElementById("popup-background"),
+  popupBoxes: document.getElementsByClassName("popup-boxes"),
+  cog: document.getElementById("cog"),
+  rotate: document.getElementById("rotate"),
+  close: document.getElementById("close"),
+  key: document.getElementById("key"),
+  url: document.getElementById("url"),
+  shortcutStatus: document.getElementById("shortcut-status"),
+  savedShortcuts: document.getElementById("saved-shortcuts"),
+  font: document.getElementById("font"),
+  fontPreview: document.getElementById("font-preview"),
+  sizeNumber: document.getElementById("size-number"),
+  sizeRange: document.getElementById("size-range"),
+  heightNumber: document.getElementById("height-number"),
+  heightRange: document.getElementById("height-range"),
+};
+
+function getShortcutOrder() {
+  try {
+    return JSON.parse(localStorage.getItem("shortcutOrder")) || [];
+  } catch {
+    return [];
+  }
+}
+
+function setShortcutOrder(order) {
+  localStorage.setItem("shortcutOrder", JSON.stringify(order));
+}
+
+function getTextSettings() {
+  return {
+    font: localStorage.getItem("TextFont") || DEFAULTS.textFont,
+    size: parseInt(localStorage.getItem("TextSize"), 10) || DEFAULTS.textSize,
+    position: parseInt(localStorage.getItem("TextPosition"), 10) || DEFAULTS.textPosition,
+  };
+}
+
+function clampNumber(value, min, max, fallback) {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return fallback;
+  return Math.min(Math.max(parsed, min), max);
+}
+
+function normalizeShortcutKey(key) {
+  return key.trim().slice(0, 1).toLowerCase();
+}
+
+function normalizeUrl(value) {
+  const trimmed = value.trim();
+  if (!trimmed) return "";
+
+  const withProtocol = /^[a-z][a-z\d+\-.]*:\/\//i.test(trimmed)
+    ? trimmed
+    : `https://${trimmed}`;
+  const url = new URL(withProtocol);
+
+  if (!["http:", "https:"].includes(url.protocol)) {
+    throw new Error("Only http and https URLs are supported.");
+  }
+
+  return url.href;
+}
+
+function setShortcutStatus(message, isError = false) {
+  elements.shortcutStatus.textContent = message;
+  elements.shortcutStatus.style.color = isError ? "#b00020" : "";
+}
+
 function formatTimeDate() {
-    const now = new Date();
-    let hours = now.getHours() % 12 || 12; // Convert to 12-hour format, ensuring 12:00 is displayed correctly
-    let minutes = String(now.getMinutes()).padStart(2, '0'); // Add leading zero if needed
-    let seconds = String(now.getSeconds()).padStart(2, '0'); // Add leading zero if needed
-    
-    const time = `${hours}:${minutes}:${seconds}`; // Construct the time string
-    const date = now.toLocaleDateString('en-GB', { 
-        weekday: 'long', 
-        day: 'numeric', 
-        month: 'short' 
-    }).replace(' ', ', '); // Add a comma between weekday and date
-    
-    document.getElementById('time').textContent = time;
-    document.getElementById('date').textContent = date;
-    document.getElementById('font-preview').textContent = `${time} ${date}`;
+  const now = new Date();
+  const hours = now.getHours() % 12 || 12;
+  const minutes = String(now.getMinutes()).padStart(2, "0");
+  const seconds = String(now.getSeconds()).padStart(2, "0");
+  const time = `${hours}:${minutes}:${seconds}`;
+  const date = now
+    .toLocaleDateString("en-GB", {
+      weekday: "long",
+      day: "numeric",
+      month: "short",
+    })
+    .replace(" ", ", ");
 
-    document.title = time;
+  elements.time.textContent = time;
+  elements.date.textContent = date;
+  elements.fontPreview.textContent = `${time} ${date}`;
+  document.title = time;
 }
 
-// Show popup
 function showPopup() {
-    displayShortcuts();
-    const popup = document.getElementById('popup');
-    const background = document.getElementById('popup-background');
-    const boxes = document.getElementsByClassName('popup-boxes');
-   
-    popup.style.visibility = 'visible'; // Make popup visible
-    popup.style.opacity = '1';         // Ensure opacity is fully visible   
-    popup.style.display = 'flex';
-   
+  displayShortcuts();
+  elements.popup.style.visibility = "visible";
+  elements.popup.style.opacity = "1";
+  elements.popup.setAttribute("aria-hidden", "false");
+  elements.popupBackground.style.animation = "fadeIn 0.2s forwards";
 
+  for (const box of elements.popupBoxes) {
+    box.style.animation = "slideIn 0.25s forwards";
+  }
 
-    background.style.animation = 'fadeIn 0.2s forwards';
-
-    for (box of boxes) {
-        box.style.animation = 'slideIn 0.3s forwards';
-    }
-
-
-    const cog = document.getElementById('cog');
-    cog.style.visibility = 'hidden';
-
+  elements.cog.style.visibility = "hidden";
+  elements.close.focus();
 }
 
-// Hide popup
 function hidePopup() {
-    updateFavicons();
-    const popup = document.getElementById('popup');
-    const background = document.getElementById('popup-background');
-    const boxes = document.getElementsByClassName('popup-boxes');
+  updateFavicons();
+  elements.popupBackground.style.animation = "fadeOut 0.2s forwards";
 
-    background.style.animation = 'fadeOut 0.2s forwards';
-    
+  for (const box of elements.popupBoxes) {
+    box.style.animation = "slideOut 0.2s forwards";
+  }
 
-    for (box of boxes) {
-        box.style.animation = 'slideOut 0.3s forwards';
-    }
+  window.setTimeout(() => {
+    elements.popup.style.visibility = "hidden";
+    elements.popup.style.opacity = "0";
+    elements.popup.setAttribute("aria-hidden", "true");
+  }, 220);
 
-
-    setTimeout(() => {
-        popup.style.visibility = 'hidden'; 
-        popup.style.opacity = '0';        
-
-    }, 300); // Match the duration of the animations
-
-    const cog = document.getElementById('cog');
-    cog.style.visibility = 'visible';
+  elements.cog.style.visibility = "visible";
+  elements.cog.focus();
 }
-
 
 function saveShortcut() {
-    const key = document.getElementById('key').value;
-    const url = document.getElementById('url').value;
-  
-    if (key && url) {
-      localStorage.setItem(key, url);
-      
-  
-      // Add to shortcutOrder
-      const shortcutOrder = JSON.parse(localStorage.getItem('shortcutOrder')) || [];
-      if (!shortcutOrder.includes(key)) {
-        shortcutOrder.push(key);
-        localStorage.setItem('shortcutOrder', JSON.stringify(shortcutOrder));
+  const key = normalizeShortcutKey(elements.key.value);
+  let url = "";
 
-        displayShortcuts()
-        alert(`Shortcut saved! Press '${key}' to open ${url}`);
-      }
-    } else if (key && !url && localStorage.getItem(key)) {
-      localStorage.removeItem(key);
-        
-      // Remove from shortcutOrder
-      let shortcutOrder = JSON.parse(localStorage.getItem('shortcutOrder')) || [];
-      shortcutOrder = shortcutOrder.filter(k => k !== key);
-      localStorage.setItem('shortcutOrder', JSON.stringify(shortcutOrder));
-
-      displayShortcuts()
-      alert(`Shortcut for key '${key}' has been deleted.`);
-
-      
-    } else {
-      alert('Please enter a key and optionally a URL to save, or just a key to delete its shortcut.');
-    }
+  try {
+    url = normalizeUrl(elements.url.value);
+  } catch (error) {
+    setShortcutStatus(error.message, true);
+    return;
   }
-  
-// Display saved shortcuts in the popup with editable key and URL inputs,
+
+  if (!key) {
+    setShortcutStatus("Enter a single shortcut key.", true);
+    return;
+  }
+
+  if (!url) {
+    deleteShortcut(key);
+    setShortcutStatus(`Removed shortcut for "${key}".`);
+    elements.key.value = "";
+    return;
+  }
+
+  localStorage.setItem(key, url);
+
+  const shortcutOrder = getShortcutOrder().filter((item) => item !== key && item.length === 1);
+  shortcutOrder.push(key);
+  setShortcutOrder(shortcutOrder);
+
+  elements.key.value = "";
+  elements.url.value = "";
+  setShortcutStatus(`Saved "${key}" for ${new URL(url).hostname}.`);
+  displayShortcuts();
+  updateFavicons();
+}
+
 function displayShortcuts() {
-    const shortcutsContainer = document.getElementById('saved-shortcuts');
-    shortcutsContainer.innerHTML = '';
-  
-    const orderedKeys = JSON.parse(localStorage.getItem('shortcutOrder')) || [];
-    // Filter keys to include only single-character shortcuts (as before)
-    const updatedKeys = orderedKeys.filter(key => key.length === 1);
-  
-    updatedKeys.forEach(originalKey => {
-      const url = localStorage.getItem(originalKey);
-      if (url) {
-        // Create container element for the shortcut row
-        const shortcutElement = document.createElement('div');
-        shortcutElement.classList.add('shortcut');
-        // Store the current key in the element’s dataset (for later updates)
-        shortcutElement.dataset.key = originalKey;
-  
-        // Create editable input for the key
-        const keyInput = document.createElement('input');
-        keyInput.type = 'text';
-        keyInput.classList.add('shortcut-key');
-        keyInput.value = originalKey;
-        keyInput.placeholder = '#';
-        keyInput.maxLength = 1;
-        // When the key input is changed, update storage and the order
-        keyInput.addEventListener('change', function (e) {
-          const newKey = e.target.value.trim();
-          const oldKey = shortcutElement.dataset.key;
-          if (newKey && newKey !== oldKey) {
-            updateShortcutKey(oldKey, newKey);
-            // Update the dataset so future events use the new key
-            shortcutElement.dataset.key = newKey;
-          }
-        });
-  
-        // Create editable input for the URL
-        const urlInput = document.createElement('input');
-        urlInput.type = 'text';
-        urlInput.classList.add('shortcut-url');
-        urlInput.value = url;
-        urlInput.placeholder = 'URL';
-        // When the URL input is changed, update storage
-        urlInput.addEventListener('change', function (e) {
-          const newUrl = e.target.value.trim();
-          const key = shortcutElement.dataset.key;
-          if (newUrl) {
-            localStorage.setItem(key, newUrl);
-            updateFavicons();
-          }
-        });
-  
-        // Create up arrow for reordering
-        const upArrow = document.createElement('span');
-        upArrow.classList.add('material-symbols-outlined', 'reorder-btn');
-        upArrow.textContent = 'arrow_upward';
-        upArrow.title = 'Move Up';
-        upArrow.addEventListener('click', (e) => {
-          e.stopPropagation();
-          reorderShortcut(shortcutElement.dataset.key, 'up');
-        });
-  
-        // Create down arrow for reordering
-        const downArrow = document.createElement('span');
-        downArrow.classList.add('material-symbols-outlined', 'reorder-btn');
-        downArrow.textContent = 'arrow_downward';
-        downArrow.title = 'Move Down';
-        downArrow.addEventListener('click', (e) => {
-          e.stopPropagation();
-          reorderShortcut(shortcutElement.dataset.key, 'down');
-        });
-  
-        // Create delete icon to remove the shortcut
-        const deleteBtn = document.createElement('span');
-        deleteBtn.classList.add('material-symbols-outlined', 'delete-btn');
-        deleteBtn.textContent = 'delete';
-        deleteBtn.title = 'Delete Shortcut';
-        deleteBtn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          const key = shortcutElement.dataset.key;
-          deleteShortcut(key);
-        });
-  
-        // Append the inputs and buttons to the shortcut container
-        shortcutElement.appendChild(keyInput);
-        shortcutElement.appendChild(urlInput);
-        shortcutElement.appendChild(upArrow);
-        shortcutElement.appendChild(downArrow);
-        shortcutElement.appendChild(deleteBtn);
-  
-        // add drag-and-drop support as before
-        shortcutElement.setAttribute('draggable', 'true');
-        shortcutElement.addEventListener('dragstart', handleDragStart);
-        shortcutElement.addEventListener('dragover', handleDragOver);
-        shortcutElement.addEventListener('drop', handleDrop);
-  
-        shortcutsContainer.appendChild(shortcutElement);
+  elements.savedShortcuts.innerHTML = "";
+  const orderedKeys = getShortcutOrder().filter((key) => key.length === 1 && localStorage.getItem(key));
+
+  if (orderedKeys.length !== getShortcutOrder().length) {
+    setShortcutOrder(orderedKeys);
+  }
+
+  orderedKeys.forEach((originalKey) => {
+    const url = localStorage.getItem(originalKey);
+    const shortcutElement = document.createElement("div");
+    shortcutElement.className = "shortcut";
+    shortcutElement.dataset.key = originalKey;
+    shortcutElement.draggable = true;
+
+    const keyInput = document.createElement("input");
+    keyInput.type = "text";
+    keyInput.className = "shortcut-key";
+    keyInput.value = originalKey;
+    keyInput.placeholder = "#";
+    keyInput.maxLength = 1;
+    keyInput.ariaLabel = "Shortcut key";
+    keyInput.addEventListener("change", (event) => {
+      const newKey = normalizeShortcutKey(event.target.value);
+      const oldKey = shortcutElement.dataset.key;
+      if (!newKey || newKey === oldKey) {
+        event.target.value = oldKey;
+        return;
       }
-    });
-    
-    updateUrlInputWidth();
-    setPopupWidth();
-  }
-  
-  //set width of url inputs to fit text content
-function updateUrlInputWidth(){
-  const urlInputs = document.querySelectorAll('.shortcut input.shortcut-url')
-  urlInputs.forEach(input=>{
-    //create temporary span for measurement
-    const span=document.createElement('span')
-    span.style.visibility='hidden'
-    span.style.whiteSpace='nowrap'
-    span.style.font=window.getComputedStyle(input).font
-    span.textContent=input.value||input.placeholder
-    document.body.appendChild(span)
-    //measure text width and add extra padding
-    const width=span.offsetWidth+20
-    input.style.width=width+'px'
-    document.body.removeChild(span)
-  })
-}
 
-
-function setPopupWidth(){
-    const boxes = document.querySelectorAll('.popup-boxes');
-    let maxWidth = 0;
-
-    
-    
-    // Find the maximum width among all boxes
-    boxes.forEach(box => {
-        const width = box.offsetWidth;
-        if (width > maxWidth) {
-            maxWidth = width;
-        }
+      updateShortcutKey(oldKey, newKey);
+      shortcutElement.dataset.key = newKey;
+      setShortcutStatus(`Changed "${oldKey}" to "${newKey}".`);
     });
 
-    maxWidth++;//add 1px to prevent wrapping
-
-    // Apply the maximum width to **all** boxes
-    boxes.forEach(box => {
-        box.style.width = `${maxWidth}px`;
-    });
-
-    //put text in after assigning width so it will wrap
-    document.getElementById("Text-Settings-Note").innerHTML = "Note: Font must be installed on your system and an <strong>exact match</strong> is required.";
-}
-
-// Update favicons row
-function updateFavicons() {
-    const faviconsContainer = document.getElementById('favicons');
-    faviconsContainer.innerHTML = '';
-
-    const orderedKeys = JSON.parse(localStorage.getItem('shortcutOrder')) || Object.keys(localStorage);
-
-    const updatedKeys = orderedKeys.filter(key => key.length == 1);//cookies from v1 and cookies for colours
-
-    updatedKeys.forEach(key => {
-        const url = localStorage.getItem(key);
-    
-        if (url) {
-            const faviconElement = document.createElement('a');
-            faviconElement.href = url;
-            faviconElement.target = '_self';
-            
-            const urlHostName = new URL(url).hostname;
-
-           const faviconImg = document.createElement('img');
-            //try default favicon location
-            const testFavicon = new Image();
-            testFavicon.src = `https://${urlHostName}/favicon.ico`;
-            
-            testFavicon.onload = () => {
-                faviconImg.src = testFavicon.src;
-            };
-            
-            testFavicon.onerror = () => {
-                if (urlHostName === "calendar.google.com") {
-                    // Special case for Google Calendar favicon
-                    const currentDay = new Date().getDate();
-                    faviconImg.src = `https://calendar.google.com/googlecalendar/images/favicons_2020q4/calendar_${currentDay}.ico`;
-                } else {
-                    // Default fallback to Google S2 favicon service
-                    console.warn(`Favicon not found for ${urlHostName}.`);
-                    faviconImg.src = `https://www.google.com/s2/favicons?domain=${urlHostName}`;
-                }
-            };
-            faviconImg.title = `${key} | ${urlHostName}`;
-            faviconImg.alt = `key ${key} for ${urlHostName}`;
-            faviconImg.classList.add('favicon');
-
-            faviconElement.appendChild(faviconImg);
-
-            if (faviconsContainer.childNodes.length > 0) {
-                faviconsContainer.appendChild(document.createTextNode(' • '));
-            }
-
-            faviconsContainer.appendChild(faviconElement);
-        }
-    });
-}
-// Helper to update a shortcut’s key (changing both the localStorage and the order array)
-function updateShortcutKey(oldKey, newKey) {
-    const url = localStorage.getItem(oldKey);
-    if (!url) return;
-    // Remove the old key and store the URL under the new key
-    localStorage.removeItem(oldKey);
-    localStorage.setItem(newKey, url);
-  
-    // Update the shortcutOrder array
-    let shortcutOrder = JSON.parse(localStorage.getItem('shortcutOrder')) || [];
-    const index = shortcutOrder.indexOf(oldKey);
-    if (index !== -1) {
-      shortcutOrder[index] = newKey;
-      localStorage.setItem('shortcutOrder', JSON.stringify(shortcutOrder));
-    }
-    updateFavicons();
-  }
-  
-  // Helper to delete a shortcut (removes both the localStorage item and its order)
-  function deleteShortcut(key) {
-    localStorage.removeItem(key);
-    let shortcutOrder = JSON.parse(localStorage.getItem('shortcutOrder')) || [];
-    shortcutOrder = shortcutOrder.filter(k => k !== key);
-    localStorage.setItem('shortcutOrder', JSON.stringify(shortcutOrder));
-    displayShortcuts();
-    updateFavicons();
-  }
-  
-  // Reordering function remains the same as before:
-  function reorderShortcut(key, direction) {
-    const orderedKeys = JSON.parse(localStorage.getItem('shortcutOrder')) || [];
-    const index = orderedKeys.indexOf(key);
-    if (index === -1) return;
-    if (direction === 'up' && index > 0) {
-      [orderedKeys[index - 1], orderedKeys[index]] = [orderedKeys[index], orderedKeys[index - 1]];
-    } else if (direction === 'down' && index < orderedKeys.length - 1) {
-      [orderedKeys[index], orderedKeys[index + 1]] = [orderedKeys[index + 1], orderedKeys[index]];
-    }
-    localStorage.setItem('shortcutOrder', JSON.stringify(orderedKeys));
-    displayShortcuts();
-    updateFavicons();
-  } 
-  
-  // Drag and drop functionality remains the same
-  function handleDragStart(event) {
-    event.dataTransfer.setData('text/plain', event.target.dataset.key);
-  }
-  
-  function handleDragOver(event) {
-    event.preventDefault();
-  }
-  
-  function handleDrop(event) {
-    event.preventDefault();
-    const draggedKey = event.dataTransfer.getData('text/plain');
-    // Using closest() to ensure we get the correct element in case an arrow was the target
-    const targetElement = event.target.closest('.shortcut');
-    if (!targetElement) return;
-    const targetKey = targetElement.dataset.key;
-  
-    if (draggedKey && targetKey && draggedKey !== targetKey) {
-      const orderedKeys = JSON.parse(localStorage.getItem('shortcutOrder')) || [];
-      const draggedIndex = orderedKeys.indexOf(draggedKey);
-      const targetIndex = orderedKeys.indexOf(targetKey);
-  
-      if (draggedIndex > -1 && targetIndex > -1) {
-        orderedKeys.splice(draggedIndex, 1);
-        orderedKeys.splice(targetIndex, 0, draggedKey);
-        localStorage.setItem('shortcutOrder', JSON.stringify(orderedKeys));
-        displayShortcuts();
+    const urlInput = document.createElement("input");
+    urlInput.type = "text";
+    urlInput.className = "shortcut-url";
+    urlInput.value = url;
+    urlInput.placeholder = "URL";
+    urlInput.ariaLabel = `URL for ${originalKey}`;
+    urlInput.addEventListener("change", (event) => {
+      try {
+        const newUrl = normalizeUrl(event.target.value);
+        localStorage.setItem(shortcutElement.dataset.key, newUrl);
+        event.target.value = newUrl;
+        setShortcutStatus(`Updated "${shortcutElement.dataset.key}".`);
         updateFavicons();
+      } catch (error) {
+        event.target.value = localStorage.getItem(shortcutElement.dataset.key);
+        setShortcutStatus(error.message, true);
       }
+    });
+
+    shortcutElement.append(
+      keyInput,
+      urlInput,
+      createShortcutButton("arrow_upward", "Move up", () => reorderShortcut(shortcutElement.dataset.key, "up")),
+      createShortcutButton("arrow_downward", "Move down", () => reorderShortcut(shortcutElement.dataset.key, "down")),
+      createShortcutButton("delete", "Delete shortcut", () => {
+        deleteShortcut(shortcutElement.dataset.key);
+        setShortcutStatus(`Deleted "${shortcutElement.dataset.key}".`);
+      }, "delete-btn"),
+    );
+
+    shortcutElement.addEventListener("dragstart", handleDragStart);
+    shortcutElement.addEventListener("dragover", handleDragOver);
+    shortcutElement.addEventListener("drop", handleDrop);
+    elements.savedShortcuts.appendChild(shortcutElement);
+  });
+}
+
+function createShortcutButton(icon, label, onClick, extraClass = "reorder-btn") {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = `icon-button material-symbols-outlined ${extraClass}`;
+  button.textContent = icon;
+  button.title = label;
+  button.ariaLabel = label;
+  button.addEventListener("click", (event) => {
+    event.stopPropagation();
+    onClick();
+  });
+  return button;
+}
+
+function updateFavicons() {
+  elements.favicons.innerHTML = "";
+  const orderedKeys = getShortcutOrder().filter((key) => key.length === 1 && localStorage.getItem(key));
+
+  orderedKeys.forEach((key) => {
+    const url = localStorage.getItem(key);
+    let parsedUrl;
+
+    try {
+      parsedUrl = new URL(url);
+    } catch {
+      return;
     }
+
+    const link = document.createElement("a");
+    link.href = parsedUrl.href;
+    link.title = `${key} | ${parsedUrl.hostname}`;
+    link.ariaLabel = `Open ${parsedUrl.hostname} with shortcut ${key}`;
+
+    const img = document.createElement("img");
+    img.alt = "";
+    img.className = "favicon";
+    img.src = faviconUrlFor(parsedUrl.hostname);
+
+    link.appendChild(img);
+    elements.favicons.appendChild(link);
+  });
+}
+
+function faviconUrlFor(hostname) {
+  if (hostname === "calendar.google.com") {
+    const currentDay = new Date().getDate();
+    return `https://calendar.google.com/googlecalendar/images/favicons_2020q4/calendar_${currentDay}.ico`;
   }
 
-// Handle key press
-function handleKeyPress(event) {
-    const key = event.key;
-    const url = localStorage.getItem(key);
-    const popupVisible = document.getElementById('popup').style.opacity === '1';
-
-    if (!popupVisible && url) {
-        window.open(url, '_blank');
-        window.close();
-    }
-
-    // Close popup on Escape key
-    if (event.key === 'Escape') {
-        hidePopup();
-    }
+  return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(hostname)}&sz=64`;
 }
 
-// Rotate content
-function rotateContent() {
-    const container = document.getElementById('time-date');
-    const currentRotation = parseFloat(container.style.transform.replace('rotate(', '').replace('deg)', '')) || 0;
-    container.style.transform = `rotate(${currentRotation + 90}deg)`;
-}
-
-// Set event listeners
-document.getElementById('cog').addEventListener('click', showPopup);
-document.getElementById('save-shortcuts-button').addEventListener('click', saveShortcut);
-document.getElementById('url').addEventListener('keydown', function(event) {if (event.key === 'Enter') {saveShortcut();}});
-document.getElementById('close').addEventListener('click', hidePopup);
-document.getElementById('rotate').addEventListener('click', rotateContent);
-document.getElementById('reset_settings_colours').addEventListener('click', resetColours);
-document.getElementById('reset_settings_text').addEventListener('click', resetText);
-document.getElementById('save-text-button').addEventListener('click', saveText);
-document.getElementById('font').addEventListener('keydown', function(event) {if (event.key === 'Enter') {saveText();}});
-document.getElementById('size-range').addEventListener('input', saveSizeRange);
-document.getElementById('size-number').addEventListener('input', saveSizeNumber);
-document.getElementById('height-range').addEventListener('input', saveHeightRange);
-document.getElementById('height-number').addEventListener('input', saveHeightNumber);
-document.addEventListener('keydown', handleKeyPress);
-document.getElementById('popup-background').addEventListener('click', (event) => { if (event.target === document.getElementById('popup-background')) { hidePopup();}});
-
-
-
-
-// Update time and date every second
-setInterval(formatTimeDate, 1000);
-
-// Initialize time, date, and favicons
-formatTimeDate();
-updateFavicons();
-
-window.addEventListener("load", () => {
+function updateShortcutKey(oldKey, newKey) {
+  if (localStorage.getItem(newKey)) {
+    setShortcutStatus(`"${newKey}" is already in use.`, true);
     displayShortcuts();
-    updateColours();
-    updateText();
-//Note: Font must be installed on your system and an <strong>exact match</strong> is required.
-});
+    return;
+  }
 
-function updateColours(){
-    const BGColour = localStorage.getItem("BGColour");
-    const TextColour = localStorage.getItem("TextColour");
+  const url = localStorage.getItem(oldKey);
+  if (!url) return;
 
-    document.body.style.backgroundColor = BGColour;
-    document.body.style.color = TextColour;
+  localStorage.removeItem(oldKey);
+  localStorage.setItem(newKey, url);
 
-    document.body.style.visibility = "visible";
+  const shortcutOrder = getShortcutOrder().map((key) => (key === oldKey ? newKey : key));
+  setShortcutOrder(shortcutOrder);
+  displayShortcuts();
+  updateFavicons();
 }
 
-function resetColours(){
-
-    localStorage.removeItem("BGColour");
-    localStorage.removeItem("TextColour");
-
-    updateColours();
-
-    $("#BG-colour-picker").spectrum("set", "#222222");
-    $("#TXT-colour-picker").spectrum("set", "#ffffff");
+function deleteShortcut(key) {
+  localStorage.removeItem(key);
+  setShortcutOrder(getShortcutOrder().filter((item) => item !== key));
+  displayShortcuts();
+  updateFavicons();
 }
 
-    $("#BG-colour-picker").spectrum({
-    color: localStorage.getItem("BGColour") || "#222222",
+function reorderShortcut(key, direction) {
+  const orderedKeys = getShortcutOrder();
+  const index = orderedKeys.indexOf(key);
+  if (index === -1) return;
+
+  if (direction === "up" && index > 0) {
+    [orderedKeys[index - 1], orderedKeys[index]] = [orderedKeys[index], orderedKeys[index - 1]];
+  } else if (direction === "down" && index < orderedKeys.length - 1) {
+    [orderedKeys[index], orderedKeys[index + 1]] = [orderedKeys[index + 1], orderedKeys[index]];
+  }
+
+  setShortcutOrder(orderedKeys);
+  displayShortcuts();
+  updateFavicons();
+}
+
+function handleDragStart(event) {
+  event.dataTransfer.setData("text/plain", event.currentTarget.dataset.key);
+}
+
+function handleDragOver(event) {
+  event.preventDefault();
+}
+
+function handleDrop(event) {
+  event.preventDefault();
+  const draggedKey = event.dataTransfer.getData("text/plain");
+  const targetElement = event.target.closest(".shortcut");
+  if (!targetElement || draggedKey === targetElement.dataset.key) return;
+
+  const orderedKeys = getShortcutOrder();
+  const draggedIndex = orderedKeys.indexOf(draggedKey);
+  const targetIndex = orderedKeys.indexOf(targetElement.dataset.key);
+  if (draggedIndex === -1 || targetIndex === -1) return;
+
+  orderedKeys.splice(draggedIndex, 1);
+  orderedKeys.splice(targetIndex, 0, draggedKey);
+  setShortcutOrder(orderedKeys);
+  displayShortcuts();
+  updateFavicons();
+}
+
+function handleKeyPress(event) {
+  if (event.key === "Escape" && isPopupVisible()) {
+    hidePopup();
+    return;
+  }
+
+  if (isEditableTarget(event.target) || isPopupVisible()) return;
+
+  const url = localStorage.getItem(event.key.toLowerCase());
+  if (url) {
+    window.location.href = url;
+  }
+}
+
+function isPopupVisible() {
+  return elements.popup.getAttribute("aria-hidden") === "false";
+}
+
+function isEditableTarget(target) {
+  return ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName) || target.isContentEditable;
+}
+
+function rotateContent() {
+  const currentRotation = parseFloat(elements.timeDate.dataset.rotation || "0");
+  const nextRotation = currentRotation + 90;
+  elements.timeDate.dataset.rotation = String(nextRotation);
+  elements.timeDate.style.transform = `rotate(${nextRotation}deg)`;
+}
+
+function updateColours() {
+  const bgColour = localStorage.getItem("BGColour") || DEFAULTS.bgColour;
+  const textColour = localStorage.getItem("TextColour") || DEFAULTS.textColour;
+
+  document.body.style.backgroundColor = bgColour;
+  document.body.style.color = textColour;
+}
+
+function resetColours() {
+  localStorage.setItem("BGColour", DEFAULTS.bgColour);
+  localStorage.setItem("TextColour", DEFAULTS.textColour);
+  updateColours();
+  $("#BG-colour-picker").spectrum("set", DEFAULTS.bgColour);
+  $("#TXT-colour-picker").spectrum("set", DEFAULTS.textColour);
+}
+
+function updateText() {
+  const settings = getTextSettings();
+  const size = clampNumber(settings.size, 24, 180, DEFAULTS.textSize);
+  const position = clampNumber(settings.position, -320, 320, DEFAULTS.textPosition);
+
+  elements.timeDate.style.fontFamily = `"${settings.font}", Arial, sans-serif`;
+  elements.timeDate.style.fontSize = `${size}px`;
+  elements.time.style.fontSize = `${size * 2}px`;
+  elements.timeDate.style.marginTop = `${position}px`;
+
+  elements.fontPreview.style.fontFamily = `"${settings.font}", Arial, sans-serif`;
+  elements.font.style.fontFamily = `"${settings.font}", Arial, sans-serif`;
+  elements.font.value = settings.font;
+  elements.sizeNumber.value = size;
+  elements.sizeRange.value = size;
+  elements.heightNumber.value = position;
+  elements.heightRange.value = position;
+}
+
+function resetText() {
+  localStorage.setItem("TextFont", DEFAULTS.textFont);
+  localStorage.setItem("TextSize", `${DEFAULTS.textSize}px`);
+  localStorage.setItem("TextPosition", `${DEFAULTS.textPosition}px`);
+  updateText();
+}
+
+function saveText() {
+  localStorage.setItem("TextFont", elements.font.value.trim() || DEFAULTS.textFont);
+  updateText();
+}
+
+function saveSizeNumber() {
+  elements.sizeRange.value = elements.sizeNumber.value;
+  saveSize();
+}
+
+function saveSizeRange() {
+  elements.sizeNumber.value = elements.sizeRange.value;
+  saveSize();
+}
+
+function saveSize() {
+  const size = clampNumber(elements.sizeNumber.value, 24, 180, DEFAULTS.textSize);
+  localStorage.setItem("TextSize", `${size}px`);
+  updateText();
+}
+
+function saveHeightNumber() {
+  elements.heightRange.value = elements.heightNumber.value;
+  saveHeight();
+}
+
+function saveHeightRange() {
+  elements.heightNumber.value = elements.heightRange.value;
+  saveHeight();
+}
+
+function saveHeight() {
+  const position = clampNumber(elements.heightNumber.value, -320, 320, DEFAULTS.textPosition);
+  localStorage.setItem("TextPosition", `${position}px`);
+  updateText();
+}
+
+function initialiseColourPickers() {
+  $("#BG-colour-picker").spectrum({
+    color: localStorage.getItem("BGColour") || DEFAULTS.bgColour,
     showInput: true,
     cancelText: "Cancel",
     chooseText: "Select",
     preferredFormat: "hex",
-    change: function(color) {
-    console.log("New colour selected: " + color.toHexString());
-    localStorage.setItem("BGColour", color.toHexString());
-    updateColours();
-    }
-});
+    change(color) {
+      localStorage.setItem("BGColour", color.toHexString());
+      updateColours();
+    },
+  });
 
-//TODO: detect when colour picker input type="text" changed and assign that 
-
-$("#TXT-colour-picker").spectrum({
-    color: localStorage.getItem("TextColour") || "#ffffff",
+  $("#TXT-colour-picker").spectrum({
+    color: localStorage.getItem("TextColour") || DEFAULTS.textColour,
     showInput: true,
     cancelText: "Cancel",
     chooseText: "Select",
     preferredFormat: "hex",
-    change: function(color) {
-    console.log("New colour selected: " + color.toHexString());
-    localStorage.setItem("TextColour", color.toHexString());
-    updateColours();
-    }
-});
-function updateText(){
-    const TextFont = localStorage.getItem("TextFont");
-    const TextSize = localStorage.getItem("TextSize");
-    const TextPosition = localStorage.getItem("TextPosition");
-
-    //apply changes to the time-date div
-    document.getElementById('time-date').style.fontFamily = `${TextFont},Sans-serif`;
-    document.getElementById('time-date').style.fontSize = TextSize;
-    document.getElementById('time').style.fontSize = TextSize.replace("px","")*2+"px";
-    document.getElementById('time-date').style.marginTop = TextPosition;
-
-    //apply changes to the font preview
-    document.getElementById('font-preview').style.fontFamily = `${TextFont},Sans-serif`;
-    document.getElementById('font').style.fontFamily = `${TextFont},Sans-serif`;
-
-    //apply changes to the font picker
-    document.getElementById('font').value = TextFont;
-
-    //apply changes to the font size
-    document.getElementById('size-number').value = TextSize.replace("px","");
-    document.getElementById('size-range').value = TextSize.replace("px",""); 
-
-    //apply changes to the font position
-    document.getElementById('height-number').value = TextPosition.replace("px","");
-    document.getElementById('height-range').value = TextPosition.replace("px","");
-}
-function resetText(){
-    localStorage.setItem("TextFont","Arial");
-    localStorage.setItem("TextSize","60px");
-    localStorage.setItem("TextPosition","0px");
-
-    updateText();
+    change(color) {
+      localStorage.setItem("TextColour", color.toHexString());
+      updateColours();
+    },
+  });
 }
 
-function saveText(){
-    const TextFont = document.getElementById('font').value;
-    localStorage.setItem("TextFont", TextFont);
-
-    updateText();
-
+function setEventListeners() {
+  elements.cog.addEventListener("click", showPopup);
+  document.getElementById("save-shortcuts-button").addEventListener("click", saveShortcut);
+  elements.url.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") saveShortcut();
+  });
+  elements.key.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") elements.url.focus();
+  });
+  elements.close.addEventListener("click", hidePopup);
+  elements.rotate.addEventListener("click", rotateContent);
+  document.getElementById("reset_settings_colours").addEventListener("click", resetColours);
+  document.getElementById("reset_settings_text").addEventListener("click", resetText);
+  document.getElementById("save-text-button").addEventListener("click", saveText);
+  elements.font.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") saveText();
+  });
+  elements.sizeRange.addEventListener("input", saveSizeRange);
+  elements.sizeNumber.addEventListener("input", saveSizeNumber);
+  elements.heightRange.addEventListener("input", saveHeightRange);
+  elements.heightNumber.addEventListener("input", saveHeightNumber);
+  document.addEventListener("keydown", handleKeyPress);
+  elements.popupBackground.addEventListener("click", (event) => {
+    if (event.target === elements.popupBackground) hidePopup();
+  });
 }
 
-
-function saveSizeNumber(){
-    const numberInput = document.getElementById('size-number');
-    const rangeInput = document.getElementById('size-range');
-
-    rangeInput.value = numberInput.value;
-    saveSize();
+function initialise() {
+  initialiseColourPickers();
+  setEventListeners();
+  formatTimeDate();
+  updateColours();
+  updateText();
+  updateFavicons();
+  displayShortcuts();
+  document.getElementById("Text-Settings-Note").innerHTML =
+    "Note: font must be installed on your system and an <strong>exact match</strong> is required.";
+  window.setInterval(formatTimeDate, 1000);
 }
 
-function saveSizeRange(){
-    const numberInput = document.getElementById('size-number');
-    const rangeInput = document.getElementById('size-range');
-
-    numberInput.value = rangeInput.value;
-    saveSize();
-}
-
-function saveSize(){
-    const TextSize = document.getElementById('size-number').value;
-    localStorage.setItem("TextSize", `${TextSize}px`);
-    
-    updateText();
-}
-
-
-
-
-function saveHeightNumber(){
-    const numberInput = document.getElementById('height-number');
-    const rangeInput = document.getElementById('height-range');
-
-    rangeInput.value = numberInput.value;
-    saveHeight();
-}
-
-function saveHeightRange(){
-    const numberInput = document.getElementById('height-number');
-    const rangeInput = document.getElementById('height-range');
-
-    numberInput.value = rangeInput.value;
-    saveHeight();
-}
-
-function saveHeight(){
-    const TextPosition = document.getElementById('height-number').value;
-    localStorage.setItem("TextPosition", `${TextPosition}px`);
-    
-    updateText();
-}
+initialise();
