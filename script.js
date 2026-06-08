@@ -292,7 +292,7 @@ function faviconUrlFor(hostname) {
     return `https://www.gstatic.com/images/branding/productlogos/calendar_2026_${currentDay}/v2/ico/calendar_2026_${currentDay}_32dp.ico`;
   }
 
-  return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(hostname)}&sz=64`;
+  return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(hostname)}`;
 }
 
 function updateShortcutKey(oldKey, newKey) {
