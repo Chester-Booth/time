@@ -279,7 +279,8 @@ function updateFavicons() {
     const img = document.createElement("img");
     img.alt = "";
     img.className = "favicon";
-    img.src = faviconUrlFor(parsedUrl.hostname);
+    img.src = faviconUrlFor(parsedUrl.hostname).then(url => {
+      img.src = url;});
 
     link.appendChild(img);
     elements.favicons.appendChild(link);
@@ -287,12 +288,64 @@ function updateFavicons() {
 }
 
 function faviconUrlFor(hostname) {
-  if (hostname === "calendar.google.com") {
-    const currentDay = String(new Date().getDate()).padStart(2, "0");
-    return `https://calendar.google.com/googlecalendar/images/favicons_2026/calendar_12${currentDay}_32.ico`;
-  }
+    return new Promise((resolve) => {
+        // Special case: Google Calendar
+        if (hostname === "calendar.google.com") {
+            const currentDay = String(new Date().getDate()).padStart(2, "0");
+            const url =
+                `https://calendar.google.com/googlecalendar/images/favicons_2026/calendar_${currentDay}_32.ico`;
 
-  return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(hostname)}`;
+            console.log(`[favicon] calendar special → ${url}`);
+            resolve(url);
+            return;
+        }
+
+        const sources = [
+            {
+                name: "Direct favicon.ico",
+                url: `https://${hostname}/favicon.ico`
+            },
+            {
+                name: "Google S2",
+                url: `https://www.google.com/s2/favicons?domain=${encodeURIComponent(hostname)}&sz=64`
+            },
+            {
+                name: "Icon Horse",
+                url: `https://icon.horse/icon/${encodeURIComponent(hostname)}`
+            },
+   
+        ];
+
+        function tryNext(index) {
+            if (index >= sources.length) {
+                console.log(`[favicon] failed for ${hostname}`);
+                resolve(null);
+                return;
+            }
+
+            const source = sources[index];
+
+            const img = new Image();
+
+            img.onload = () => {
+                console.log(
+                    `[favicon] success (${source.name}) → ${source.url}`
+                );
+                resolve(source.url);
+            };
+
+            img.onerror = () => {
+                console.log(
+                    `[favicon] failed (${source.name}) → trying next`
+                );
+                tryNext(index + 1);
+            };
+
+            img.src = source.url;
+        }
+
+        tryNext(0);
+    });
 }
 
 function updateShortcutKey(oldKey, newKey) {
