@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Simple New Tab",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "A minimal clock new tab page with custom colours, text settings, and keyboard shortcuts.",
   "icons": {
     "48": "icons/extension-48.png",
